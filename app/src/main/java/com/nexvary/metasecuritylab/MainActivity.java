@@ -1,7 +1,7 @@
 package com.nexvary.metasecuritylab;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Intent;\nimport android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -69,7 +69,7 @@ public class MainActivity extends Activity {
         webView = new WebView(this);
         webView.setBackgroundColor(Color.rgb(6, 13, 20));
         webView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
+        WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String appVersion() {
-            return BuildConfig.VERSION_NAME;
+            return currentVersion();
         }
 
         private String sanitizeFileName(String name) {
@@ -192,6 +192,14 @@ public class MainActivity extends Activity {
             Toast.makeText(this, "تم حفظ تقرير NEXVARY", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             Toast.makeText(this, "تعذر حفظ التقرير", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String currentVersion() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (Exception e) {
+            return "2.50.0";
         }
     }
 
