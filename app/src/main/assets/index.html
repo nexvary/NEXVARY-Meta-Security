@@ -25,7 +25,7 @@
     <button type="button" data-view="paths" data-i18n="navPaths">المسارات</button>
     <button type="button" data-view="labs" data-i18n="navLabs">المختبرات</button>
     <button type="button" data-view="exam" data-i18n="navExam">الامتحان</button>
-    <button type="button" data-view="activity" data-i18n="navActivity">السجل</button>
+    <button type="button" data-view="activity" data-i18n="navActivity">السجل</button>\n    <button type="button" data-view="hackgpt">HackGPT</button>
     <button type="button" data-view="glossary" data-i18n="navGlossary">المصطلحات</button>
     <button type="button" data-view="about" data-i18n="navAbout">حول</button>
   </nav>
@@ -218,6 +218,89 @@
     </section>
   </main>
 
+  <main id="hackgptView" class="view">
+    <section class="hero compact">
+      <div class="eyebrow">NEXVARY × HACKGPT ENTERPRISE</div>
+      <div class="section-head">
+        <div>
+          <h2 id="hgTitle">HackGPT — التدريب والحوكمة المؤسسية</h2>
+          <p id="hgDesc">منهج تدريبي موسع مع واجهة Enterprise لعرض حالة HackGPT والجلسات والتقارير، مع بقاء بدء الاختبارات الفعلية داخل وحدة المشغل المصرح بها.</p>
+        </div>
+        <span id="hgModeBadge" class="enterprise-badge">Training</span>
+      </div>
+      <div class="safe">
+        <strong id="hgSafetyTitle">قاعدة NEXVARY:</strong>
+        <span id="hgSafetyText"> أي اختبار فعلي يحتاج أصلًا مسجلًا ومرجع موافقة مكتوبة ونطاقًا ونافذة صيانة. التطبيق لا يوفر تشغيل استغلال مباشر.</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h3 id="hgLecturesTitle">محاضرات HackGPT الموسعة</h3><span>10 Modules</span></div>
+      <div id="hgLectures" class="lecture-grid"></div>
+    </section>
+
+    <section class="section enterprise-grid">
+      <article class="enterprise-card">
+        <h3 id="hgGovernanceTitle">سجل الموافقة والحوكمة</h3>
+        <p id="hgGovernanceDesc">سجل مرجع التفويض قبل أن يستخدم المشغل HackGPT لإجراء اختبار على أجهزة الشركة.</p>
+
+        <label class="field-label">Asset ID
+          <input id="hgAssetId" type="text" placeholder="PC-SEC-001" autocomplete="off">
+        </label>
+
+        <label class="field-label">Authorization ID
+          <input id="hgAuthorizationId" type="text" placeholder="AUTH-2026-001" autocomplete="off">
+        </label>
+
+        <label class="field-label" id="hgOwnerLabel">المالك / الفريق
+          <input id="hgOwner" type="text" placeholder="NEXVARY IT / Security">
+        </label>
+
+        <label class="field-label" id="hgScopeLabel">النطاق المعتمد
+          <textarea id="hgScope" rows="3" placeholder="Internal company device assessment"></textarea>
+        </label>
+
+        <label class="field-label" id="hgWindowLabel">نافذة الصيانة
+          <input id="hgWindow" type="text" placeholder="2026-09-24 02:00–04:00">
+        </label>
+
+        <label class="field-label" id="hgTokenLabel">Gateway Token
+          <input id="hgToken" type="password" placeholder="Stored only for this screen session" autocomplete="off">
+        </label>
+
+        <button id="hgRegisterAuthorization" class="primary wide" type="button">تسجيل الموافقة</button>
+      </article>
+
+      <article class="enterprise-card">
+        <h3 id="hgConnectorTitle">HackGPT Enterprise Connector</h3>
+        <div class="connector-meta">
+          <div><span>Mode</span><strong id="hgModeText">—</strong></div>
+          <div><span>Connector</span><strong id="hgConnectorUrl">—</strong></div>
+        </div>
+
+        <div class="actions">
+          <button id="hgHealth" class="secondary" type="button">Health</button>
+          <button id="hgSessions" class="secondary" type="button">Sessions</button>
+        </div>
+
+        <label class="field-label">Report / Session ID
+          <input id="hgReportId" type="text" placeholder="session-id">
+        </label>
+        <button id="hgReport" class="secondary wide" type="button">عرض التقرير</button>
+
+        <div class="enterprise-divider"></div>
+
+        <h3 id="hgOperatorTitle">تشغيل الاختبارات الفعلية</h3>
+        <p id="hgOperatorText">بعد تسجيل الموافقة، يبدأ مسؤول الأمن الاختبار من HackGPT Enterprise Console على خادم NEXVARY الداخلي. التطبيق يعرض الحالة والنتائج ولا يعرّض أوامر استغلال مباشرة.</p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="section-head"><h3 id="hgOutputTitle">النتيجة / سجل الاتصال</h3><span id="hgStatus">Idle</span></div>
+      <pre id="hgOutput">—</pre>
+    </section>
+  </main>
+
   <main id="glossaryView" class="view">
     <section class="hero compact"><h2 data-i18n="glossaryTitle">قاموس الباحث</h2><p data-i18n="glossaryDesc">مصطلحات أساسية لفهم السبب الجذري والضوابط الدفاعية.</p></section>
     <input id="glossarySearch" class="single-search" type="search" placeholder="بحث في المصطلحات...">
@@ -244,6 +327,6 @@
 
 <script src="labs.js"></script>
 <script src="curriculum.js"></script>
-<script src="app.js"></script>
+<script src="hackgpt-lectures.js"></script>\n<script src="app.js"></script>\n<script src="enterprise.js"></script>
 </body>
 </html>
