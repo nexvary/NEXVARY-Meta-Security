@@ -10,88 +10,239 @@
 <body>
 <header class="top">
   <div class="brandbar">
-    <div class="brand"><div class="mark">N</div><div><h1>NEXVARY Meta Security Lab</h1><p>Stage 80 • Offline Security Training</p></div></div>
-    <div class="safe-chip">100 مختبر • Offline</div>
+    <div class="brand">
+      <div class="mark">N</div>
+      <div><h1>NEXVARY Meta Security Lab</h1><p id="stageLabel">Stage 250 • Offline Security Training</p></div>
+    </div>
+    <div class="top-actions">
+      <button id="langToggle" class="mini-btn" type="button" aria-label="Language">EN</button>
+      <div class="safe-chip" data-i18n="safeChip">100 مختبر • Offline</div>
+    </div>
   </div>
   <nav class="nav" aria-label="التنقل">
-    <button type="button" data-view="dashboard" class="active">الرئيسية</button>
-    <button type="button" data-view="labs">المختبرات</button>
-    <button type="button" data-view="glossary">المصطلحات</button>
-    <button type="button" data-view="about">حول</button>
+    <button type="button" data-view="dashboard" class="active" data-i18n="navDashboard">الرئيسية</button>
+    <button type="button" data-view="paths" data-i18n="navPaths">المسارات</button>
+    <button type="button" data-view="labs" data-i18n="navLabs">المختبرات</button>
+    <button type="button" data-view="exam" data-i18n="navExam">الامتحان</button>
+    <button type="button" data-view="activity" data-i18n="navActivity">السجل</button>
+    <button type="button" data-view="glossary" data-i18n="navGlossary">المصطلحات</button>
+    <button type="button" data-view="about" data-i18n="navAbout">حول</button>
   </nav>
 </header>
 
 <div class="shell">
   <main id="dashboardView" class="view active">
     <section class="hero">
-      <h2>لوحة الباحث الأمني</h2>
-      <p>تدريب عملي معزول على المصادقة، OAuth، التحكم في الوصول، APIs، الجلسات، Webhooks، الخصوصية، State Machines، منطق الأعمال وأمن تطبيقات الهاتف.</p>
-      <div class="safe"><strong>وضع آمن:</strong> لا توجد اتصالات خارجية ولا صلاحية Internet. جميع الحسابات والرموز والطلبات والنتائج وهمية ومخصصة للتدريب.</div>
-      <div class="stats">
-        <div class="stat"><strong id="doneCount">0</strong><span>مكتمل / 100</span></div>
+      <div class="eyebrow">NEXVARY SECURITY ACADEMY</div>
+      <h2 data-i18n="dashboardTitle">لوحة الباحث الأمني</h2>
+      <p data-i18n="dashboardDesc">منصة تدريب عملية معزولة لفهم حدود الثقة، المصادقة، OAuth، التحكم في الوصول، APIs، الجلسات، الخصوصية، منطق الأعمال وأمن الهاتف.</p>
+      <div class="safe"><strong data-i18n="safeMode">وضع آمن:</strong> <span data-i18n="safeDesc">لا توجد اتصالات خارجية ولا صلاحية Internet. جميع الحسابات والرموز والطلبات والنتائج وهمية.</span></div>
+      <div class="stats six">
+        <div class="stat"><strong id="doneCount">0</strong><span data-i18n="statCompleted">مكتمل / 100</span></div>
         <div class="stat"><strong id="xpCount">0</strong><span>XP</span></div>
-        <div class="stat"><strong id="rankText">متدرب</strong><span>الرتبة</span></div>
-        <div class="stat"><strong id="streakText">0</strong><span>سلسلة أيام</span></div>
+        <div class="stat"><strong id="rankText">—</strong><span data-i18n="statRank">الرتبة</span></div>
+        <div class="stat"><strong id="streakText">0</strong><span data-i18n="statStreak">سلسلة أيام</span></div>
+        <div class="stat"><strong id="bestExam">—</strong><span data-i18n="statExam">أفضل امتحان</span></div>
+        <div class="stat"><strong id="notesCount">0</strong><span data-i18n="statNotes">ملاحظات</span></div>
       </div>
       <div class="progress"><span id="progressBar"></span></div>
-      <div class="actions"><button id="continueLab" class="primary" type="button">متابعة آخر مختبر</button><button id="randomLab" class="secondary" type="button">مختبر عشوائي</button></div>
+      <div class="actions">
+        <button id="continueLab" class="primary" type="button" data-i18n="continueLab">متابعة آخر مختبر</button>
+        <button id="recommendedLab" class="secondary" type="button" data-i18n="recommendedLab">المختبر المقترح</button>
+        <button id="randomLab" class="secondary" type="button" data-i18n="randomLab">مختبر عشوائي</button>
+      </div>
     </section>
 
-    <section class="section"><div class="section-head"><h3>تقدم المسارات</h3><span>10 مسارات × 10 مختبرات</span></div><div id="trackProgress" class="track-grid"></div></section>
-    <section class="section"><div class="section-head"><h3>الإنجازات</h3><span>محفوظة على الجهاز</span></div><div id="achievements" class="achievement-grid"></div></section>
+    <section class="section">
+      <div class="section-head"><h3 data-i18n="trackProgress">تقدم المسارات</h3><span data-i18n="tenTracks">10 مسارات × 10 مختبرات</span></div>
+      <div id="trackProgress" class="track-grid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h3 data-i18n="skillSnapshot">مؤشر المهارات</h3><span data-i18n="basedOnProgress">حسب التقدم والنتائج</span></div>
+      <div id="skillSnapshot" class="skill-grid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-head"><h3 data-i18n="achievements">الإنجازات</h3><span data-i18n="localOnly">محفوظة محليًا</span></div>
+      <div id="achievements" class="achievement-grid"></div>
+    </section>
+  </main>
+
+  <main id="pathsView" class="view">
+    <section class="hero compact">
+      <h2 data-i18n="pathsTitle">مسارات التعلم</h2>
+      <p data-i18n="pathsDesc">ابدأ بمسار مرتب أو تابع من أول مختبر غير مكتمل داخله.</p>
+    </section>
+    <div id="learningPaths" class="path-grid"></div>
   </main>
 
   <main id="labsView" class="view">
-    <div class="section-head" style="margin-top:12px"><h3>مكتبة المختبرات</h3><span id="countText"></span></div>
+    <div class="section-head page-head"><h3 data-i18n="labLibrary">مكتبة المختبرات</h3><span id="countText"></span></div>
     <section class="filters">
-      <input id="search" type="search" placeholder="بحث: OAuth، IDOR، 2FA، Webhook...">
-      <select id="difficulty"><option value="all">كل المستويات</option><option>مبتدئ</option><option>متوسط</option><option>متقدم</option></select>
-      <select id="kind"><option value="all">كل السيناريوهات</option><option value="historical">مرجع تاريخي</option><option value="synthetic">تعليمي اصطناعي</option></select>
-      <button id="resetFilters" class="secondary" type="button">مسح الفلاتر</button>
+      <input id="search" type="search" placeholder="بحث: OAuth، IDOR، 2FA، Webhook..." aria-label="Search">
+      <select id="difficulty" aria-label="Difficulty">
+        <option value="all" data-i18n="allLevels">كل المستويات</option>
+        <option value="مبتدئ" data-i18n="beginner">مبتدئ</option>
+        <option value="متوسط" data-i18n="intermediate">متوسط</option>
+        <option value="متقدم" data-i18n="advanced">متقدم</option>
+      </select>
+      <select id="kind" aria-label="Scenario type">
+        <option value="all" data-i18n="allScenarios">كل السيناريوهات</option>
+        <option value="historical" data-i18n="historical">مرجع تاريخي</option>
+        <option value="synthetic" data-i18n="synthetic">تعليمي اصطناعي</option>
+      </select>
+      <select id="sortMode" aria-label="Sort">
+        <option value="order" data-i18n="sortOrder">الترتيب التعليمي</option>
+        <option value="difficulty" data-i18n="sortDifficulty">حسب الصعوبة</option>
+        <option value="severity" data-i18n="sortSeverity">حسب الخطورة</option>
+        <option value="score" data-i18n="sortScore">حسب أفضل نتيجة</option>
+      </select>
+      <button id="resetFilters" class="secondary" type="button" data-i18n="clearFilters">مسح الفلاتر</button>
     </section>
     <div id="quickTracks" class="quickfilters"></div>
-    <div class="quickfilters">
-      <button type="button" data-status="all" class="active">الكل</button>
-      <button type="button" data-status="todo">غير مكتمل</button>
-      <button type="button" data-status="done">مكتمل</button>
-      <button type="button" data-status="fav">المفضلة</button>
-      <button id="randomLab2" type="button">عشوائي</button>
+    <div class="quickfilters statusfilters">
+      <button type="button" data-status="all" class="active" data-i18n="all">الكل</button>
+      <button type="button" data-status="todo" data-i18n="notCompleted">غير مكتمل</button>
+      <button type="button" data-status="done" data-i18n="completed">مكتمل</button>
+      <button type="button" data-status="fav" data-i18n="favorites">المفضلة</button>
+      <button id="randomLab2" type="button" data-i18n="random">عشوائي</button>
     </div>
     <section id="cards" class="cards"></section>
   </main>
 
   <main id="labView" class="view">
-    <div class="lab-head"><div><h2 id="labTitle"></h2><div id="labMeta" class="meta"></div></div><button id="labBack" class="back" type="button">رجوع</button></div>
-    <section id="historyPanel" class="panel"></section>
-    <div class="two">
-      <section class="panel"><h3>السيناريو</h3><p id="scenario"></p></section>
-      <section class="panel"><h3>مهمة الباحث</h3><p id="objective"></p></section>
+    <div class="lab-head">
+      <div>
+        <div class="eyebrow" id="labTrackLabel"></div>
+        <h2 id="labTitle"></h2>
+        <div id="labMeta" class="meta"></div>
+      </div>
+      <button id="labBack" class="back" type="button" data-i18n="back">رجوع</button>
     </div>
-    <section class="panel"><h3>الإشارة الأمنية التي تبحث عنها</h3><p id="signal"></p><button id="hintBtn" class="secondary" style="margin-top:9px" type="button">إظهار / إخفاء Hint</button><div id="hintBox" class="hint"><span id="hintText"></span></div></section>
+
+    <div id="labBadges" class="metric-row"></div>
+
+    <section id="historyPanel" class="panel"></section>
+
+    <div class="two">
+      <section class="panel"><h3 data-i18n="scenario">السيناريو</h3><p id="scenario"></p></section>
+      <section class="panel"><h3 data-i18n="mission">مهمة الباحث</h3><p id="objective"></p></section>
+    </div>
+
+    <div class="two">
+      <section class="panel"><h3 data-i18n="securitySignal">الإشارة الأمنية</h3><p id="signal"></p><button id="hintBtn" class="secondary small" type="button" data-i18n="toggleHint">إظهار / إخفاء Hint</button><div id="hintBox" class="hint"><span id="hintText"></span></div></section>
+      <section class="panel"><h3 data-i18n="prerequisites">المتطلبات السابقة</h3><div id="prerequisites" class="check-list"></div></section>
+    </div>
+
     <section class="panel">
-      <h3>مقارنة السلوك</h3>
+      <h3 data-i18n="behaviorCompare">مقارنة السلوك</h3>
       <div class="mode-switch"><button type="button" data-mode="vulnerable" class="active">Vulnerable</button><button type="button" data-mode="patched">Patched</button></div>
-      <p id="modeCaption" style="margin-bottom:8px"></p>
-      <div class="two"><div><h3>Request</h3><pre id="request"></pre></div><div><h3>Response</h3><pre id="response"></pre></div></div>
+      <p id="modeCaption" class="muted"></p>
+      <div class="two code-pair"><div><h3>Request</h3><pre id="request"></pre></div><div><h3>Response</h3><pre id="response"></pre></div></div>
     </section>
-    <section class="panel"><h3>اختبار التشخيص</h3><p>اختر السبب الجذري الأكثر دقة.</p><div id="answers" class="answers"></div><div id="result" class="result"></div></section>
-    <div id="rootBox" class="two reveal"><section class="panel"><h3>السبب الجذري</h3><p id="rootCause"></p></section><section class="panel"><h3>الإصلاح الدفاعي</h3><p id="remediation"></p></section></div>
-    <section class="panel note-box"><h3>ملاحظات الباحث</h3><textarea id="noteText" placeholder="اكتب ملاحظاتك عن هذا المختبر..."></textarea><div class="actions"><button id="saveNote" class="primary" type="button">حفظ الملاحظة</button></div><div id="noteStatus" class="note-status"></div></section>
-    <div class="lab-nav"><button id="prevLab" type="button">المختبر السابق</button><button id="nextLab" type="button">المختبر التالي</button></div>
+
+    <div class="two">
+      <section class="panel"><h3 data-i18n="analystChecklist">Checklist الباحث</h3><div id="analystChecklist" class="check-list"></div></section>
+      <section class="panel"><h3 data-i18n="evidence">الأدلة المطلوبة</h3><div id="evidenceList" class="check-list"></div></section>
+    </div>
+
+    <section class="panel quiz-panel">
+      <div class="section-head"><h3 data-i18n="diagnosticTest">اختبار التشخيص</h3><span id="liveScore">100</span></div>
+      <p data-i18n="chooseRoot">اختر السبب الجذري الأكثر دقة.</p>
+      <div id="answers" class="answers"></div>
+      <div id="result" class="result" aria-live="polite"></div>
+    </section>
+
+    <div id="rootBox" class="two reveal">
+      <section class="panel"><h3 data-i18n="rootCause">السبب الجذري</h3><p id="rootCause"></p></section>
+      <section class="panel"><h3 data-i18n="defensiveFix">الإصلاح الدفاعي</h3><p id="remediation"></p></section>
+    </div>
+
+    <section id="verifyPanel" class="panel reveal-block">
+      <h3 data-i18n="verificationChecklist">Checklist التحقق من الإصلاح</h3>
+      <div id="verificationList" class="check-list"></div>
+    </section>
+
+    <section class="panel note-box">
+      <h3 data-i18n="researchNotes">ملاحظات الباحث</h3>
+      <textarea id="noteText" placeholder="اكتب ملاحظاتك عن هذا المختبر..."></textarea>
+      <div class="actions"><button id="saveNote" class="primary" type="button" data-i18n="saveNote">حفظ الملاحظة</button><button id="favoriteCurrent" class="secondary" type="button">☆</button></div>
+      <div id="noteStatus" class="note-status"></div>
+    </section>
+
+    <div class="lab-nav"><button id="prevLab" type="button" data-i18n="previousLab">المختبر السابق</button><button id="nextLab" type="button" data-i18n="nextLab">المختبر التالي</button></div>
   </main>
 
-  <main id="glossaryView" class="view"><section class="hero"><h2>قاموس الباحث</h2><p>مصطلحات أساسية لفهم السيناريوهات وربط الثغرة بالسبب الجذري والضابط الدفاعي.</p></section><div id="glossaryGrid" class="glossary-grid"></div></main>
+  <main id="examView" class="view">
+    <section class="hero compact">
+      <div class="eyebrow">ASSESSMENT MODE</div>
+      <h2 data-i18n="examTitle">امتحان الباحث</h2>
+      <p data-i18n="examDesc">10 أسئلة، سؤال واحد من كل مسار. النتيجة تحفظ محليًا وتظهر في التقرير.</p>
+    </section>
+    <section id="examStart" class="exam-card">
+      <div class="stats three">
+        <div class="stat"><strong>10</strong><span data-i18n="questions">أسئلة</span></div>
+        <div class="stat"><strong id="examBestStart">—</strong><span data-i18n="bestScore">أفضل نتيجة</span></div>
+        <div class="stat"><strong id="examAttempts">0</strong><span data-i18n="attempts">محاولات</span></div>
+      </div>
+      <button id="startExam" class="primary wide" type="button" data-i18n="startExam">بدء الامتحان</button>
+    </section>
+    <section id="examQuestion" class="exam-card hidden">
+      <div class="section-head"><h3 id="examCounter"></h3><span id="examTimer">00:00</span></div>
+      <div id="examLabMeta" class="meta"></div>
+      <h2 id="examPrompt" class="exam-prompt"></h2>
+      <div id="examAnswers" class="answers"></div>
+    </section>
+    <section id="examResult" class="exam-card hidden">
+      <div class="score-ring"><strong id="examScore">0%</strong><span data-i18n="finalScore">النتيجة النهائية</span></div>
+      <div id="examBreakdown" class="breakdown"></div>
+      <div class="actions"><button id="examAgain" class="primary" type="button" data-i18n="retryExam">إعادة الامتحان</button><button id="exportExam" class="secondary" type="button" data-i18n="exportReport">تصدير التقرير</button></div>
+    </section>
+  </main>
+
+  <main id="activityView" class="view">
+    <section class="hero compact">
+      <h2 data-i18n="activityTitle">سجل التدريب والتقرير</h2>
+      <p data-i18n="activityDesc">يعرض آخر أنشطة التدريب على هذا الجهاز فقط ويمكنك تصدير تقرير نصي محلي.</p>
+      <div class="actions"><button id="saveReport" class="primary" type="button" data-i18n="saveReport">حفظ التقرير</button><button id="shareReport" class="secondary" type="button" data-i18n="shareReport">مشاركة التقرير</button></div>
+    </section>
+    <section class="section">
+      <div class="section-head"><h3 data-i18n="weakAreas">المسارات التي تحتاج تدريبًا</h3><span data-i18n="lowestProgress">الأقل تقدمًا أولًا</span></div>
+      <div id="weakAreas" class="track-grid"></div>
+    </section>
+    <section class="section">
+      <div class="section-head"><h3 data-i18n="recentActivity">آخر النشاطات</h3><button id="clearActivity" class="ghost" type="button" data-i18n="clearLog">مسح السجل</button></div>
+      <div id="activityList" class="activity-list"></div>
+    </section>
+  </main>
+
+  <main id="glossaryView" class="view">
+    <section class="hero compact"><h2 data-i18n="glossaryTitle">قاموس الباحث</h2><p data-i18n="glossaryDesc">مصطلحات أساسية لفهم السبب الجذري والضوابط الدفاعية.</p></section>
+    <input id="glossarySearch" class="single-search" type="search" placeholder="بحث في المصطلحات...">
+    <div id="glossaryGrid" class="glossary-grid"></div>
+  </main>
 
   <main id="aboutView" class="view">
-    <section class="about-card"><h3>NEXVARY Meta Security Lab</h3><p>تطبيق Android تدريبي مستقل يعمل Offline. الهدف هو بناء منهج تفكير دفاعي لفهم الثغرات من خلال بيئة محاكاة محلية، وليس فحص خدمات حقيقية.</p></section>
+    <section class="about-card"><h3>NEXVARY Meta Security Lab</h3><p data-i18n="aboutDesc">تطبيق Android تدريبي مستقل يعمل Offline لبناء منهج تفكير دفاعي داخل محاكاة محلية.</p></section>
+
+    <section class="about-card">
+      <h3 data-i18n="accessibility">إعدادات الوصول</h3>
+      <div class="setting-row"><span data-i18n="textSize">حجم النص</span><select id="textScale"><option value="100">100%</option><option value="115">115%</option><option value="130">130%</option></select></div>
+      <label class="switch-row"><input id="highContrast" type="checkbox"><span data-i18n="highContrast">تباين مرتفع</span></label>
+      <label class="switch-row"><input id="reduceMotion" type="checkbox"><span data-i18n="reduceMotion">تقليل الحركة</span></label>
+    </section>
+
     <section class="about-card"><h3>NEXVARY</h3><div>Website: https://nexvary.com/<br>Facebook: https://www.facebook.com/share/14p9krEn5ij/<br>Email: info@nexvary.com<br>YouTube: www.youtube.com/@NexvaryInc<br>X: https://x.com/Nexvary</div></section>
-    <section class="about-card"><h3>الخصوصية والأمان</h3><p>لا يطلب التطبيق INTERNET permission. تقدمك وملاحظاتك ومفضلتك مخزنة محليًا على الجهاز فقط.</p><button id="resetProgress" class="secondary" type="button">تصفير البيانات المحلية</button></section>
+
+    <section class="about-card"><h3 data-i18n="privacySecurity">الخصوصية والأمان</h3><p data-i18n="privacyDesc">لا يطلب التطبيق INTERNET permission. التقدم والملاحظات والنتائج مخزنة محليًا على الجهاز.</p><button id="resetProgress" class="secondary" type="button" data-i18n="resetLocal">تصفير البيانات المحلية</button></section>
   </main>
 
-  <footer class="footer">NEXVARY Meta Security Lab • Stage 80<br>استخدم أي معرفة أمنية فقط على الأنظمة التي تملكها أو لديك تصريح واضح لاختبارها.</footer>
+  <footer class="footer">NEXVARY Meta Security Lab • Stage 250<br><span data-i18n="footerSafety">استخدم المعرفة الأمنية فقط على الأنظمة التي تملكها أو لديك تصريح واضح لاختبارها.</span></footer>
 </div>
 
 <script src="labs.js"></script>
+<script src="curriculum.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
