@@ -7,17 +7,15 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
+import android.view.WindowInsets;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -50,44 +48,25 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(Color.rgb(6, 13, 20));
         root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
-        LinearLayout bar = new LinearLayout(this);
-        bar.setOrientation(LinearLayout.HORIZONTAL);
-        bar.setGravity(Gravity.CENTER_VERTICAL);
-        bar.setPadding(12, 8, 12, 8);
-        bar.setBackgroundColor(Color.rgb(10, 21, 31));
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            int topInset;
+            int bottomInset;
 
-        Button back = new Button(this);
-        back.setText("رجوع");
-        back.setAllCaps(false);
-        back.setContentDescription("الرجوع داخل التطبيق");
-        back.setOnClickListener(v -> goBackSafely());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                topInset = insets.getInsets(
+                        WindowInsets.Type.statusBars()
+                ).top;
+                bottomInset = insets.getInsets(
+                        WindowInsets.Type.navigationBars()
+                ).bottom;
+            } else {
+                topInset = insets.getSystemWindowInsetTop();
+                bottomInset = insets.getSystemWindowInsetBottom();
+            }
 
-        TextView title = new TextView(this);
-        title.setText(
-                BuildConfig.ENTERPRISE_MODE
-                        ? "NEXVARY Meta Security • Enterprise"
-                        : "NEXVARY Meta Security • Training"
-        );
-        title.setTextColor(Color.WHITE);
-        title.setTextSize(16);
-        title.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
-        title.setPadding(16, 0, 16, 0);
-
-        bar.addView(
-                back,
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-        );
-        bar.addView(
-                title,
-                new LinearLayout.LayoutParams(
-                        0,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        1f
-                )
-        );
+            view.setPadding(0, topInset, 0, bottomInset);
+            return insets;
+        });
 
         webView = new WebView(this);
         webView.setBackgroundColor(Color.rgb(6, 13, 20));
@@ -111,7 +90,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.60.0"
+                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.61.0"
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -162,13 +141,6 @@ public class MainActivity extends Activity {
         });
 
         root.addView(
-                bar,
-                new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-        );
-        root.addView(
                 webView,
                 new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
@@ -178,6 +150,7 @@ public class MainActivity extends Activity {
         );
 
         setContentView(root);
+        root.requestApplyInsets();
         webView.loadUrl("file:///android_asset/index.html");
     }
 
@@ -507,9 +480,9 @@ public class MainActivity extends Activity {
                     getPackageManager()
                             .getPackageInfo(getPackageName(), 0)
                             .versionName;
-            return version == null ? "2.60.0" : version;
+            return version == null ? "2.61.0" : version;
         } catch (Exception e) {
-            return "2.60.0";
+            return "2.61.0";
         }
     }
 
