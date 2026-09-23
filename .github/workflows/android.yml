@@ -1,4 +1,4 @@
-name: Android APK Build
+name: Android Stage 250 Gate
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,7 +30,6 @@ jobs:
       - name: Locate Android SDK tools
         shell: bash
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort -V | tail -1)"
           test -n "$SDKMANAGER"
           echo "SDKMANAGER=$SDKMANAGER" >> "$GITHUB_ENV"
@@ -42,50 +41,97 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Stage 80 static gate
+      - name: Stage 250 static gate
         shell: bash
         run: |
+          set -euo pipefail
           test -f app/src/main/assets/index.html
           test -f app/src/main/assets/styles.css
           test -f app/src/main/assets/labs.js
+          test -f app/src/main/assets/curriculum.js
           test -f app/src/main/assets/app.js
           test -f app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
           test -f app/src/main/res/drawable/ic_nexvary.xml
+
           ! grep -q 'android.permission.INTERNET' app/src/main/AndroidManifest.xml
           grep -q 'targetSdk 35' app/build.gradle
-          grep -q "versionCode 80" app/build.gradle
-          grep -q "versionName '1.80.0'" app/build.gradle
+          grep -q 'versionCode 250' app/build.gradle
+          grep -q "versionName '2.50.0'" app/build.gradle
+          grep -q 'Content-Security-Policy' app/src/main/assets/index.html
+          grep -q "connect-src 'none'" app/src/main/assets/index.html
+          grep -q 'NexvaryNative' app/src/main/assets/app.js
+          grep -q 'addJavascriptInterface' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'Offline training boundary' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+
           node --check app/src/main/assets/labs.js
+          node --check app/src/main/assets/curriculum.js
           node --check app/src/main/assets/app.js
+
           node - <<'NODE'
           global.window = {};
           require('./app/src/main/assets/labs.js');
-          const d = window.NEXVARY_DATA;
-          if (!d || d.labs.length !== 100 || d.tracks.length !== 10) {
-            console.error('Curriculum gate failed', d && d.labs.length, d && d.tracks.length);
-            process.exit(1);
+          require('./app/src/main/assets/curriculum.js');
+
+          const base = window.NEXVARY_DATA;
+          const curriculum = window.NEXVARY_CURRICULUM;
+          const labs = curriculum.enrich(base.labs);
+
+          if (!base || base.tracks.length !== 10 || labs.length !== 100) {
+            throw new Error('Expected 10 tracks and 100 labs');
           }
-          const ids = new Set(d.labs.map(x => x.id));
-          if (ids.size !== 100) {
-            console.error('Duplicate lab IDs detected');
-            process.exit(1);
+
+          const ids = new Set(labs.map(x => x.id));
+          if (ids.size !== 100) throw new Error('Duplicate lab IDs detected');
+
+          const required = ['owasp','cwe','severity','basePoints','skillLevel','estimatedMinutes','prerequisites','analystChecklistAr','analystChecklistEn','verificationAr','verificationEn'];
+          for (const lab of labs) {
+            for (const key of required) {
+              if (lab[key] === undefined || lab[key] === null) {
+                throw new Error('Missing ' + key + ' in ' + lab.id);
+              }
+            }
           }
-          console.log('Curriculum gate PASS: 100 unique labs / 10 tracks');
+
+          if (!Array.isArray(curriculum.learningPaths) || curriculum.learningPaths.length < 4) {
+            throw new Error('Learning paths gate failed');
+          }
+
+          console.log('Stage 250 curriculum PASS: 100 unique enriched labs / 10 tracks / ' + curriculum.learningPaths.length + ' learning paths');
           NODE
+
+      - name: Android lint
+        run: gradle :app:lintDebug --stacktrace
 
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace
 
-      - name: Verify APK
+      - name: Stage 250 APK gate
         shell: bash
         run: |
-          test -s app/build/outputs/apk/debug/app-debug.apk
-          ls -lh app/build/outputs/apk/debug/app-debug.apk
-          sha256sum app/build/outputs/apk/debug/app-debug.apk
+          set -euo pipefail
+          APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          unzip -t "$APK"
 
-      - name: Upload APK
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          test -x "$AAPT"
+          test -x "$APKSIGNER"
+
+          "$AAPT" dump permissions "$APK" | tee apk-permissions.txt
+          ! grep -q 'android.permission.INTERNET' apk-permissions.txt
+          "$APKSIGNER" verify --verbose "$APK"
+
+          ls -lh "$APK"
+          sha256sum "$APK" | tee apk-sha256.txt
+
+      - name: Upload Stage 250 APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEXVARY-Meta-Security-Stage80-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: NEXVARY-Meta-Security-Stage250-debug
+          path: |
+            app/build/outputs/apk/debug/app-debug.apk
+            apk-sha256.txt
+            apk-permissions.txt
+            app/build/reports/lint-results-debug.html
           if-no-files-found: error
