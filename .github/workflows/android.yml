@@ -108,6 +108,18 @@ jobs:
           console.log('Curriculum PASS: 100 labs / 10 tracks / ' + window.NEXVARY_HACKGPT_LECTURES.length + ' HackGPT lectures');
           NODE
 
+      - name: Phone UI overlap gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'setOnApplyWindowInsetsListener' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          ! grep -q 'LinearLayout bar =' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'viewport-fit=cover' app/src/main/assets/index.html
+          grep -q 'Stage 261' app/src/main/assets/index.html
+          grep -q 'Android phone UI Release Gate v2.61' app/src/main/assets/styles.css
+          grep -q 'grid-template-columns:repeat(4,minmax(0,1fr))' app/src/main/assets/styles.css
+          grep -q 'safe-area-inset-bottom' app/src/main/assets/styles.css
+
       - name: Android lint
         run: gradle :app:lintTrainingDebug :app:lintEnterpriseDebug --stacktrace
 
