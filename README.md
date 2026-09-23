@@ -6,7 +6,7 @@ Android cybersecurity training and enterprise-assessment companion for NEXVARY.
 
 ### Training APK
 - package: `com.nexvary.metasecuritylab`
-- version: **2.60.0**
+- version: **2.61.0**
 - 100 simulated labs across 10 tracks
 - expanded HackGPT cybersecurity lectures
 - Arabic + English, RTL/LTR
@@ -15,7 +15,7 @@ Android cybersecurity training and enterprise-assessment companion for NEXVARY.
 
 ### Enterprise APK
 - package: `com.nexvary.metasecuritylab.enterprise`
-- version: **2.60.0-enterprise**
+- version: **2.61.0-enterprise**
 - includes everything in Training
 - connects through a native bridge to the **NEXVARY HackGPT Read-Only Connector**
 - can register authorization/governance records
