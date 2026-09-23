@@ -50,3 +50,26 @@ pre{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;ba
 .footer{text-align:center;color:var(--muted);font-size:10px;padding:18px 5px;line-height:1.8}
 @media(max-width:1000px){.stats.six{grid-template-columns:repeat(3,1fr)}.filters{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:760px){.shell{padding:9px}.safe-chip{display:none}.brand h1{font-size:16px}.stats,.stats.six,.stats.three{grid-template-columns:repeat(2,1fr)}.track-grid,.skill-grid,.cards,.two,.glossary-grid,.path-grid{grid-template-columns:1fr}.achievement-grid{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.top{position:static}.lab-head{align-items:flex-start}.code-pair{grid-template-columns:1fr}}
+
+
+/* HackGPT Enterprise integration */
+.enterprise-badge{display:inline-flex;align-items:center;justify-content:center;min-width:88px;min-height:34px;padding:0 10px;border:1px solid var(--purple);border-radius:999px;color:#d8c8ff;background:#171126;font-size:11px;font-weight:800}
+.lecture-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.lecture-card{border:1px solid var(--line);border-radius:13px;background:linear-gradient(160deg,var(--panel2),var(--panel));padding:13px}
+.lecture-card .lecture-id{font-size:9px;color:var(--purple);font-weight:800;letter-spacing:.08em}
+.lecture-card h4{margin:7px 0 5px;font-size:14px;color:var(--gold)}
+.lecture-card p{margin:0;font-size:11px;line-height:1.8;color:#c6d0d7}
+.enterprise-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.enterprise-card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:14px}
+.enterprise-card h3{margin:0 0 6px;color:var(--gold);font-size:15px}
+.enterprise-card p{font-size:11px;line-height:1.8;color:#c4ced5}
+.field-label{display:block;margin-top:10px;font-size:11px;color:var(--muted)}
+.field-label input,.field-label textarea{width:100%;margin-top:5px;min-height:44px;border:1px solid var(--line);border-radius:9px;background:#07121a;color:var(--text);padding:9px;resize:vertical}
+.connector-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.connector-meta>div{border:1px solid #314451;border-radius:10px;background:#08131c;padding:10px;min-width:0}
+.connector-meta span{display:block;font-size:9px;color:var(--muted)}
+.connector-meta strong{display:block;margin-top:4px;font-size:11px;overflow-wrap:anywhere}
+.enterprise-divider{height:1px;background:#263641;margin:14px 0}
+#hgOutput{max-height:360px;overflow:auto}
+.enterprise-disabled{opacity:.55;pointer-events:none}
+@media(max-width:760px){.lecture-grid,.enterprise-grid{grid-template-columns:1fr}.connector-meta{grid-template-columns:1fr}}
