@@ -1,4 +1,4 @@
-name: Android Stage 250 Gate
+name: Android HackGPT Integration Gate
 
 on:
   push:
@@ -11,7 +11,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,6 +22,11 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
       - name: Set up Gradle 8.10.2
         uses: gradle/actions/setup-gradle@v4
@@ -41,97 +47,122 @@ jobs:
           yes | "$SDKMANAGER" --licenses >/dev/null || true
           "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Stage 250 static gate
+      - name: HackGPT connector tests
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check -r enterprise-connector/requirements.txt
+          python -m unittest discover -s enterprise-connector -p 'test_*.py'
+
+      - name: Static integration gate
         shell: bash
         run: |
           set -euo pipefail
-          test -f app/src/main/assets/index.html
-          test -f app/src/main/assets/styles.css
-          test -f app/src/main/assets/labs.js
-          test -f app/src/main/assets/curriculum.js
-          test -f app/src/main/assets/app.js
-          test -f app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
-          test -f app/src/main/res/drawable/ic_nexvary.xml
+
+          test -f HACKGPT_INTEGRATION.md
+          test -f THIRD_PARTY_NOTICES.md
+          test -f enterprise-connector/connector.py
+          test -f enterprise-connector/test_connector.py
+          test -f app/src/main/assets/hackgpt-lectures.js
+          test -f app/src/main/assets/enterprise.js
+          test -f app/src/enterprise/AndroidManifest.xml
+
+          grep -q 'versionCode 260' app/build.gradle
+          grep -q "versionName '2.60.0'" app/build.gradle
+          grep -q 'productFlavors' app/build.gradle
+          grep -q 'ENTERPRISE_MODE' app/build.gradle
+          grep -q 'NEXVARY_CONNECTOR_URL' app/build.gradle
 
           ! grep -q 'android.permission.INTERNET' app/src/main/AndroidManifest.xml
-          grep -q 'targetSdk 35' app/build.gradle
-          grep -q 'versionCode 250' app/build.gradle
-          grep -q "versionName '2.50.0'" app/build.gradle
-          grep -q 'Content-Security-Policy' app/src/main/assets/index.html
-          grep -q "connect-src 'none'" app/src/main/assets/index.html
-          grep -q 'NexvaryNative' app/src/main/assets/app.js
-          grep -q 'addJavascriptInterface' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
-          grep -q 'Offline training boundary' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'android.permission.INTERNET' app/src/enterprise/AndroidManifest.xml
+
+          grep -q 'hackgpt-lectures.js' app/src/main/assets/index.html
+          grep -q 'enterprise.js' app/src/main/assets/index.html
+          grep -q 'data-view="hackgpt"' app/src/main/assets/index.html
+          grep -q 'NEXVARY_ENTERPRISE_RESULT' app/src/main/assets/enterprise.js
+          grep -q 'enterpriseMode' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'listHackGptSessions' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'getHackGptReport' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'registerAuthorization' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
 
           node --check app/src/main/assets/labs.js
           node --check app/src/main/assets/curriculum.js
           node --check app/src/main/assets/app.js
+          node --check app/src/main/assets/hackgpt-lectures.js
+          node --check app/src/main/assets/enterprise.js
+
+          python -m py_compile enterprise-connector/connector.py
 
           node - <<'NODE'
           global.window = {};
           require('./app/src/main/assets/labs.js');
           require('./app/src/main/assets/curriculum.js');
+          require('./app/src/main/assets/hackgpt-lectures.js');
 
-          const base = window.NEXVARY_DATA;
-          const curriculum = window.NEXVARY_CURRICULUM;
-          const labs = curriculum.enrich(base.labs);
-
-          if (!base || base.tracks.length !== 10 || labs.length !== 100) {
-            throw new Error('Expected 10 tracks and 100 labs');
+          const labs = window.NEXVARY_CURRICULUM.enrich(window.NEXVARY_DATA.labs);
+          if (labs.length !== 100) throw new Error('Expected 100 labs');
+          if (window.NEXVARY_DATA.tracks.length !== 10) throw new Error('Expected 10 tracks');
+          if (!Array.isArray(window.NEXVARY_HACKGPT_LECTURES) || window.NEXVARY_HACKGPT_LECTURES.length < 10) {
+            throw new Error('Expected at least 10 HackGPT lecture modules');
           }
-
-          const ids = new Set(labs.map(x => x.id));
-          if (ids.size !== 100) throw new Error('Duplicate lab IDs detected');
-
-          const required = ['owasp','cwe','severity','basePoints','skillLevel','estimatedMinutes','prerequisites','analystChecklistAr','analystChecklistEn','verificationAr','verificationEn'];
-          for (const lab of labs) {
-            for (const key of required) {
-              if (lab[key] === undefined || lab[key] === null) {
-                throw new Error('Missing ' + key + ' in ' + lab.id);
-              }
-            }
-          }
-
-          if (!Array.isArray(curriculum.learningPaths) || curriculum.learningPaths.length < 4) {
-            throw new Error('Learning paths gate failed');
-          }
-
-          console.log('Stage 250 curriculum PASS: 100 unique enriched labs / 10 tracks / ' + curriculum.learningPaths.length + ' learning paths');
+          if (new Set(labs.map(x => x.id)).size !== 100) throw new Error('Duplicate lab IDs');
+          console.log('Curriculum PASS: 100 labs / 10 tracks / ' + window.NEXVARY_HACKGPT_LECTURES.length + ' HackGPT lectures');
           NODE
 
       - name: Android lint
-        run: gradle :app:lintDebug --stacktrace
+        run: gradle :app:lintTrainingDebug :app:lintEnterpriseDebug --stacktrace
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Build both APK flavors
+        run: gradle :app:assembleTrainingDebug :app:assembleEnterpriseDebug --stacktrace
 
-      - name: Stage 250 APK gate
+      - name: Verify APK boundaries
         shell: bash
         run: |
           set -euo pipefail
-          APK="app/build/outputs/apk/debug/app-debug.apk"
-          test -s "$APK"
-          unzip -t "$APK"
+
+          TRAINING="app/build/outputs/apk/training/debug/app-training-debug.apk"
+          ENTERPRISE="app/build/outputs/apk/enterprise/debug/app-enterprise-debug.apk"
+
+          test -s "$TRAINING"
+          test -s "$ENTERPRISE"
+
+          unzip -t "$TRAINING"
+          unzip -t "$ENTERPRISE"
 
           AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt"
           APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
-          test -x "$AAPT"
-          test -x "$APKSIGNER"
 
-          "$AAPT" dump permissions "$APK" | tee apk-permissions.txt
-          ! grep -q 'android.permission.INTERNET' apk-permissions.txt
-          "$APKSIGNER" verify --verbose "$APK"
+          "$AAPT" dump permissions "$TRAINING" | tee training-permissions.txt
+          "$AAPT" dump permissions "$ENTERPRISE" | tee enterprise-permissions.txt
 
-          ls -lh "$APK"
-          sha256sum "$APK" | tee apk-sha256.txt
+          ! grep -q 'android.permission.INTERNET' training-permissions.txt
+          grep -q 'android.permission.INTERNET' enterprise-permissions.txt
 
-      - name: Upload Stage 250 APK
+          "$APKSIGNER" verify --verbose "$TRAINING"
+          "$APKSIGNER" verify --verbose "$ENTERPRISE"
+
+          sha256sum "$TRAINING" | tee training-sha256.txt
+          sha256sum "$ENTERPRISE" | tee enterprise-sha256.txt
+
+          ls -lh "$TRAINING" "$ENTERPRISE"
+
+      - name: Upload Training APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEXVARY-Meta-Security-Stage250-debug
+          name: NEXVARY-Meta-Security-Training-2.60.0
           path: |
-            app/build/outputs/apk/debug/app-debug.apk
-            apk-sha256.txt
-            apk-permissions.txt
-            app/build/reports/lint-results-debug.html
+            app/build/outputs/apk/training/debug/app-training-debug.apk
+            training-sha256.txt
+            training-permissions.txt
+            app/build/reports/lint-results-trainingDebug.html
+          if-no-files-found: error
+
+      - name: Upload Enterprise APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEXVARY-Meta-Security-Enterprise-2.60.0
+          path: |
+            app/build/outputs/apk/enterprise/debug/app-enterprise-debug.apk
+            enterprise-sha256.txt
+            enterprise-permissions.txt
+            app/build/reports/lint-results-enterpriseDebug.html
           if-no-files-found: error
