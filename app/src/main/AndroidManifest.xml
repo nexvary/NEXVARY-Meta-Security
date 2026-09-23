@@ -2,7 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
         android:allowBackup="false"
+        android:fullBackupContent="false"
         android:label="NEXVARY Meta Security"
+        android:icon="@drawable/ic_nexvary"
+        android:roundIcon="@drawable/ic_nexvary"
         android:supportsRtl="true"
         android:usesCleartextTraffic="false"
         android:theme="@android:style/Theme.Material.NoActionBar">
