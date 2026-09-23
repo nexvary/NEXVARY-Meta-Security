@@ -1,0 +1,108 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hackgpt
+      POSTGRES_USER: hackgpt
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - nexvary_security
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hackgpt -d hackgpt"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - nexvary_security
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"${REDIS_PASSWORD}\" ping | grep PONG"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  hackgpt-api:
+    build:
+      context: ${HACKGPT_DIR}
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: ["--api"]
+    environment:
+      DATABASE_URL: postgresql://hackgpt:${POSTGRES_PASSWORD}@postgres:5432/hackgpt
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      SECRET_KEY: ${HACKGPT_SECRET_KEY}
+      JWT_SECRET_KEY: ${HACKGPT_JWT_SECRET}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      HACKGPT_MODEL: ${HACKGPT_MODEL:-}
+      HACKGPT_PROVIDER: ${HACKGPT_PROVIDER:-}
+      LOCAL_LLM_ENDPOINT: ${LOCAL_LLM_ENDPOINT:-}
+      ENABLE_API_SERVER: "true"
+      ENABLE_WEB_DASHBOARD: "false"
+      ENABLE_ADVANCED_EXPLOITATION: "false"
+      ENABLE_AUTO_EXPLOIT: "false"
+      DEBUG: "false"
+      CORS_ENABLED: "false"
+      LOG_LEVEL: "INFO"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - hackgpt_reports:/reports
+      - hackgpt_logs:/hackgpt/logs
+    ports:
+      - "127.0.0.1:8000:8000"
+    networks:
+      - nexvary_security
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/api/health"]
+      interval: 20s
+      timeout: 8s
+      retries: 10
+
+  connector:
+    build:
+      context: ../../enterprise-connector
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      NEXVARY_CONNECTOR_BIND: 0.0.0.0
+      NEXVARY_CONNECTOR_PORT: "8787"
+      NEXVARY_GATEWAY_TOKEN: ${NEXVARY_GATEWAY_TOKEN}
+      NEXVARY_STATE_DIR: /state
+      HACKGPT_BASE_URL: http://hackgpt-api:8000
+    depends_on:
+      hackgpt-api:
+        condition: service_healthy
+    volumes:
+      - connector_state:/state
+    ports:
+      - "127.0.0.1:8787:8787"
+    networks:
+      - nexvary_security
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  postgres_data:
+  redis_data:
+  hackgpt_reports:
+  hackgpt_logs:
+  connector_state:
+
+networks:
+  nexvary_security:
+    driver: bridge
