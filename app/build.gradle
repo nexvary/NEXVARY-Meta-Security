@@ -26,14 +26,14 @@ android {
         training {
             dimension "mode"
             buildConfigField "boolean", "ENTERPRISE_MODE", "false"
-            buildConfigField "String", "NEXVARY_CONNECTOR_URL", """"
+            buildConfigField "String", "NEXVARY_CONNECTOR_URL", "\"\""
         }
         enterprise {
             dimension "mode"
             applicationIdSuffix ".enterprise"
             versionNameSuffix "-enterprise"
             buildConfigField "boolean", "ENTERPRISE_MODE", "true"
-            buildConfigField "String", "NEXVARY_CONNECTOR_URL", ""${connectorUrl}""
+            buildConfigField "String", "NEXVARY_CONNECTOR_URL", "\"\${connectorUrl}\""
         }
     }
 
