@@ -3,7 +3,7 @@ plugins {
 }
 
 def connectorUrl = providers.gradleProperty("NEXVARY_CONNECTOR_URL")
-        .getOrElse("https://nexvary-security-gateway.local")
+        .getOrElse("https://security-gateway.nexvary.com")
 
 android {
     namespace 'com.nexvary.metasecuritylab'
