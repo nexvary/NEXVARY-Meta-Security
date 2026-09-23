@@ -122,7 +122,22 @@
       controls.classList.toggle('enterprise-disabled', !enterpriseMode);
     }
 
-    if (!enterpriseMode) {
+    const safeDesc = document.querySelector('[data-i18n="safeDesc"]');
+    const safeChip = document.querySelector('[data-i18n="safeChip"]');
+    if (enterpriseMode) {
+      if (safeDesc) {
+        safeDesc.textContent = isAr()
+          ? 'نسخة Enterprise تتصل فقط عبر Native Connector بخادم NEXVARY الداخلي؛ WebView نفسه يمنع أي اتصال خارجي مباشر.'
+          : 'The Enterprise build connects only through the native connector to NEXVARY infrastructure; the WebView itself blocks direct external connections.';
+      }
+      if (safeChip) safeChip.textContent = isAr() ? '100 مختبر • Enterprise' : '100 Labs • Enterprise';
+    } else {
+      if (safeDesc) {
+        safeDesc.textContent = isAr()
+          ? 'لا توجد اتصالات خارجية ولا صلاحية Internet. جميع الحسابات والرموز والطلبات والنتائج وهمية.'
+          : 'No external connections and no INTERNET permission. All accounts, tokens, requests, and results are simulated.';
+      }
+      if (safeChip) safeChip.textContent = isAr() ? '100 مختبر • Offline' : '100 Labs • Offline';
       setStatus(
         'Training',
         isAr()
