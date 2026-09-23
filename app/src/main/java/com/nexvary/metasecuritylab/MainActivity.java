@@ -20,8 +20,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class MainActivity extends Activity {
@@ -56,7 +63,11 @@ public class MainActivity extends Activity {
         back.setOnClickListener(v -> goBackSafely());
 
         TextView title = new TextView(this);
-        title.setText("NEXVARY Meta Security • Stage 250");
+        title.setText(
+                BuildConfig.ENTERPRISE_MODE
+                        ? "NEXVARY Meta Security • Enterprise"
+                        : "NEXVARY Meta Security • Training"
+        );
         title.setTextColor(Color.WHITE);
         title.setTextSize(16);
         title.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
@@ -100,7 +111,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.50.0"
+                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.60.0"
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -138,10 +149,10 @@ public class MainActivity extends Activity {
                             "text/plain",
                             "UTF-8",
                             403,
-                            "Offline training boundary",
+                            "Local UI boundary",
                             null,
                             new ByteArrayInputStream(
-                                    "Blocked by offline training boundary"
+                                    "External WebView request blocked"
                                             .getBytes(StandardCharsets.UTF_8)
                             )
                     );
@@ -210,6 +221,76 @@ public class MainActivity extends Activity {
             return currentVersion();
         }
 
+        @JavascriptInterface
+        public boolean enterpriseMode() {
+            return BuildConfig.ENTERPRISE_MODE;
+        }
+
+        @JavascriptInterface
+        public String connectorUrl() {
+            return BuildConfig.NEXVARY_CONNECTOR_URL;
+        }
+
+        @JavascriptInterface
+        public void hackGptHealth(String token) {
+            runConnectorRequest(
+                    "health",
+                    "/api/v1/health",
+                    "GET",
+                    token,
+                    null
+            );
+        }
+
+        @JavascriptInterface
+        public void listHackGptSessions(String token) {
+            runConnectorRequest(
+                    "sessions",
+                    "/api/v1/hackgpt/sessions",
+                    "GET",
+                    token,
+                    null
+            );
+        }
+
+        @JavascriptInterface
+        public void getHackGptReport(String token, String reportId) {
+            String id = reportId == null ? "" : reportId.trim();
+            if (!id.matches("^[A-Za-z0-9._:-]{1,120}$")) {
+                enterpriseCallback(
+                        "report",
+                        "{\"ok\":false,\"error\":\"invalid_report_id\"}"
+                );
+                return;
+            }
+            runConnectorRequest(
+                    "report",
+                    "/api/v1/hackgpt/reports/" + id,
+                    "GET",
+                    token,
+                    null
+            );
+        }
+
+        @JavascriptInterface
+        public void registerAuthorization(String token, String jsonBody) {
+            String body = jsonBody == null ? "{}" : jsonBody;
+            if (body.length() > 12000) {
+                enterpriseCallback(
+                        "authorization",
+                        "{\"ok\":false,\"error\":\"authorization_payload_too_large\"}"
+                );
+                return;
+            }
+            runConnectorRequest(
+                    "authorization",
+                    "/api/v1/authorizations",
+                    "POST",
+                    token,
+                    body
+            );
+        }
+
         private String sanitizeFileName(String name) {
             String value =
                     name == null || name.trim().isEmpty()
@@ -223,6 +304,158 @@ public class MainActivity extends Activity {
             }
             return value;
         }
+    }
+
+    private void runConnectorRequest(
+            String type,
+            String path,
+            String method,
+            String token,
+            String body
+    ) {
+        if (!BuildConfig.ENTERPRISE_MODE) {
+            enterpriseCallback(
+                    type,
+                    "{\"ok\":false,\"error\":\"enterprise_mode_disabled\"}"
+            );
+            return;
+        }
+
+        new Thread(() -> {
+            HttpURLConnection connection = null;
+            try {
+                String base = BuildConfig.NEXVARY_CONNECTOR_URL;
+                Uri baseUri = Uri.parse(base);
+                String scheme = baseUri.getScheme();
+                String host = baseUri.getHost();
+
+                boolean secure = "https".equalsIgnoreCase(scheme);
+                boolean debugLoopback =
+                        BuildConfig.DEBUG
+                                && "http".equalsIgnoreCase(scheme)
+                                && ("127.0.0.1".equals(host)
+                                || "localhost".equalsIgnoreCase(host));
+
+                if (!secure && !debugLoopback) {
+                    enterpriseCallback(
+                            type,
+                            "{\"ok\":false,\"error\":\"connector_requires_https\"}"
+                    );
+                    return;
+                }
+
+                URL url = new URL(base.replaceAll("/+$", "") + path);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod(method);
+                connection.setConnectTimeout(7000);
+                connection.setReadTimeout(20000);
+                connection.setRequestProperty("Accept", "application/json");
+
+                String cleanToken = token == null ? "" : token.trim();
+                if (!cleanToken.isEmpty()) {
+                    connection.setRequestProperty(
+                            "X-Nexvary-Token",
+                            cleanToken
+                    );
+                }
+
+                if ("POST".equals(method)) {
+                    connection.setDoOutput(true);
+                    connection.setRequestProperty(
+                            "Content-Type",
+                            "application/json; charset=UTF-8"
+                    );
+                    try (OutputStream out = connection.getOutputStream()) {
+                        out.write(
+                                (body == null ? "{}" : body)
+                                        .getBytes(StandardCharsets.UTF_8)
+                        );
+                    }
+                }
+
+                int status = connection.getResponseCode();
+                InputStream stream =
+                        status >= 200 && status < 400
+                                ? connection.getInputStream()
+                                : connection.getErrorStream();
+
+                String responseBody = readStream(stream);
+                String payload =
+                        "{\"status\":" + status
+                                + ",\"body\":"
+                                + (responseBody == null
+                                || responseBody.trim().isEmpty()
+                                ? "{}"
+                                : responseBody)
+                                + "}";
+
+                enterpriseCallback(type, payload);
+            } catch (Exception e) {
+                String message =
+                        e.getClass().getSimpleName()
+                                + ": "
+                                + String.valueOf(e.getMessage());
+                enterpriseCallback(
+                        type,
+                        "{\"ok\":false,\"error\":"
+                                + JSONObject.quote(message)
+                                + "}"
+                );
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }, "nexvary-enterprise-connector").start();
+    }
+
+    private String readStream(InputStream stream) throws Exception {
+        if (stream == null) {
+            return "";
+        }
+
+        StringBuilder builder = new StringBuilder();
+        try (BufferedReader reader =
+                     new BufferedReader(
+                             new InputStreamReader(
+                                     stream,
+                                     StandardCharsets.UTF_8
+                             )
+                     )) {
+            String line;
+            int total = 0;
+            while ((line = reader.readLine()) != null) {
+                total += line.length();
+                if (total > 2_000_000) {
+                    throw new IllegalStateException(
+                            "connector_response_too_large"
+                    );
+                }
+                builder.append(line);
+            }
+        }
+        return builder.toString();
+    }
+
+    private void enterpriseCallback(String type, String payload) {
+        if (webView == null) {
+            return;
+        }
+
+        final String safeType = JSONObject.quote(type);
+        final String safePayload = JSONObject.quote(payload);
+
+        runOnUiThread(() -> {
+            if (webView == null) {
+                return;
+            }
+            webView.evaluateJavascript(
+                    "window.NEXVARY_ENTERPRISE_RESULT"
+                            + " && window.NEXVARY_ENTERPRISE_RESULT("
+                            + safeType + "," + safePayload + ");",
+                    null
+            );
+        });
     }
 
     @Override
@@ -274,9 +507,9 @@ public class MainActivity extends Activity {
                     getPackageManager()
                             .getPackageInfo(getPackageName(), 0)
                             .versionName;
-            return version == null ? "2.50.0" : version;
+            return version == null ? "2.60.0" : version;
         } catch (Exception e) {
-            return "2.50.0";
+            return "2.60.0";
         }
     }
 
