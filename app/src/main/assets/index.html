@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NEXVARY Meta Security</title>
+<style>
+:root{
+  --bg:#071019;--panel:#0d1823;--panel2:#101e2b;--text:#eef5fb;--muted:#9cabb8;
+  --line:#566473;--silver:#9eabb7;--gold:#d7b35a;--blue:#54a8e4;--green:#55c88a;--red:#e06d78;
+}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif}
+body{min-height:100vh;background:radial-gradient(circle at 85% 0,#132c40 0,transparent 32%),var(--bg)}
+button,input,select{font:inherit}.shell{max-width:1220px;margin:auto;padding:14px}
+.hero{border:1px solid #394b59;border-radius:18px;padding:16px;background:linear-gradient(135deg,#0d1c29,#09131c)}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:54px;height:54px;border:1px solid var(--gold);border-radius:14px;display:grid;place-items:center;color:var(--gold);font-size:28px;font-weight:800}
+h1{font-size:20px;margin:0}.hero p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.7}
+.safe{margin-top:12px;border:1px solid #6c5b2f;border-radius:12px;padding:10px 12px;background:#1b180f;color:#e8d394;font-size:12px;line-height:1.8}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.stat{border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center;background:#0a151f}.stat strong{display:block;font-size:19px;color:var(--gold)}.stat span{font-size:11px;color:var(--muted)}
+.progress{height:7px;border-radius:20px;background:#1c2a35;overflow:hidden;margin-top:10px}.progress>span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green))}
+.filters{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:8px;margin:14px 0}.filters input,.filters select{width:100%;min-height:46px;border-radius:11px;border:1px solid var(--line);background:#08131c;color:var(--text);padding:10px}
+.track-list{display:flex;gap:8px;overflow:auto;padding:2px 0 8px;scrollbar-width:thin}.track-btn{flex:0 0 auto;min-height:42px;border:1px solid var(--line);border-radius:999px;background:#0b1721;color:var(--text);padding:0 13px}.track-btn.active{border-color:var(--blue);background:#102b3f}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:8px;margin:12px 0}.section-head h2{margin:0;font-size:17px}.section-head span{color:var(--muted);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{border:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));border-radius:14px;padding:13px;min-width:0}.card.done{border-color:#3d7b5a}.card-top{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--muted)}.card h3{font-size:15px;margin:10px 0 7px;line-height:1.55}.card p{color:#c5d0d8;font-size:12px;line-height:1.75;margin:0 0 10px}.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.tag{border:1px solid #445561;border-radius:999px;padding:4px 7px;font-size:10px;color:#b9c5ce}.tag.hist{border-color:#806a34;color:#e8c76e}.tag.ok{border-color:#3d7b5a;color:#82d6a6}.open{width:100%;min-height:44px;border:1px solid #4d89ae;border-radius:10px;background:#102b3e;color:#f1f8fc;font-weight:700}
+.empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:14px;padding:28px;text-align:center;color:var(--muted)}
+.lab-view{display:none}.lab-view.show{display:block}.home.hide{display:none}
+.lab-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}.back{min-height:44px;border:1px solid var(--line);border-radius:10px;background:#101b25;color:var(--text);padding:0 14px}.lab-top h2{font-size:19px;margin:0;line-height:1.5}.meta{font-size:11px;color:var(--muted);margin-top:4px}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:13px;margin-top:10px}.panel h3{font-size:13px;color:var(--gold);margin:0 0 7px}.panel p{font-size:13px;line-height:1.85;margin:0;color:#d8e0e6}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+pre{direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;background:#050b10;border:1px solid #25333e;border-radius:10px;padding:10px;color:#b7d8ef;font:11px/1.65 Consolas,monospace;margin:0}
+.answers{display:grid;gap:8px;margin-top:10px}.answer{min-height:46px;text-align:right;border:1px solid var(--line);border-radius:10px;background:#0a151e;color:var(--text);padding:9px}.answer.correct{border-color:var(--green);background:#0b2017}.answer.wrong{border-color:var(--red);background:#251014}.result{font-size:12px;font-weight:700;line-height:1.8;margin-top:9px}.rootbox{display:none}.rootbox.show{display:grid}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:22px 5px;line-height:1.8}
+@media(max-width:700px){.shell{padding:10px}.filters{grid-template-columns:1fr}.cards,.two{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}.stat strong{font-size:16px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <main id="home" class="home">
+    <section class="hero">
+      <div class="brand">
+        <div class="mark">N</div>
+        <div><h1>NEXVARY Meta Security Lab</h1><p>100 مختبر تدريبي لاكتشاف ثغرات تطبيقات ومنصات اجتماعية داخل بيئة محلية معزولة.</p></div>
+      </div>
+      <div class="safe"><strong>وضع التدريب الآمن:</strong> التطبيق لا يرسل طلبات إلى Facebook أو Instagram أو WhatsApp أو أي خدمة خارجية. كل الحسابات والرموز والـHTTP أدناه وهمية.</div>
+      <div class="stats">
+        <div class="stat"><strong>100</strong><span>مختبر</span></div>
+        <div class="stat"><strong>10</strong><span>مسارات</span></div>
+        <div class="stat"><strong id="doneCount">0</strong><span>مكتمل</span></div>
+      </div>
+      <div class="progress"><span id="progressBar"></span></div>
+    </section>
+
+    <section class="filters">
+      <input id="search" type="search" placeholder="ابحث: OAuth، IDOR، 2FA، Webhook...">
+      <select id="difficulty"><option value="all">كل المستويات</option><option>مبتدئ</option><option>متوسط</option><option>متقدم</option></select>
+      <select id="kind"><option value="all">كل السيناريوهات</option><option value="historical">مرجع تاريخي</option><option value="synthetic">تعليمي اصطناعي</option></select>
+    </section>
+    <div id="trackButtons" class="track-list"></div>
+    <div class="section-head"><h2>مكتبة المختبرات</h2><span id="countText"></span></div>
+    <section id="cards" class="cards"></section>
+  </main>
+
+  <main id="labView" class="lab-view">
+    <div class="lab-top">
+      <div><h2 id="labTitle"></h2><div id="labMeta" class="meta"></div></div>
+      <button id="backBtn" class="back" type="button">رجوع</button>
+    </div>
+    <section id="historicalPanel" class="panel"></section>
+    <div class="two">
+      <section class="panel"><h3>السيناريو</h3><p id="scenario"></p></section>
+      <section class="panel"><h3>مهمة الباحث</h3><p id="objective"></p></section>
+    </div>
+    <section class="panel"><h3>طلب HTTP وهمي</h3><pre id="request"></pre></section>
+    <section class="panel"><h3>استجابة HTTP وهمية</h3><pre id="response"></pre></section>
+    <section class="panel">
+      <h3>اختبار التشخيص</h3>
+      <p>اختر الوصف الأكثر دقة للسبب الجذري.</p>
+      <div id="answers" class="answers"></div>
+      <div id="result" class="result"></div>
+    </section>
+    <div id="rootBox" class="two rootbox">
+      <section class="panel"><h3>السبب الجذري</h3><p id="rootCause"></p></section>
+      <section class="panel"><h3>الإصلاح الدفاعي</h3><p id="remediation"></p></section>
+    </div>
+  </main>
+
+  <footer>NEXVARY Meta Security Lab — Offline Training Edition<br>استخدم المعرفة فقط ضمن الأنظمة التي تملكها أو التي لديك تصريح واضح لاختبارها.</footer>
+</div>
+<script>
+(() => {
+const tracks=[
+{code:"AUTH",name:"المصادقة واستعادة الحساب",root:"فشل في الحفاظ على مستوى الثقة المطلوب أثناء المصادقة أو الاستعادة أو تغيير بيانات الاعتماد.",fix:"فرض Step-up Authentication، ربط خطوات الاستعادة بجلسة موثوقة، منع downgrade، تحديد المحاولات وإبطال الرموز بعد الاستخدام.",labs:["Account Recovery بدون إعادة تحقق","تجاوز 2FA عبر مسار بديل","غياب Rate Limit لرمز OTP","إعادة استخدام Recovery Token","تغيير البريد دون Step-up Authentication","تغيير الهاتف دون إعادة تحقق","جلسة Recovery غير مرتبطة بالمستخدم","User Enumeration في نسيت كلمة المرور","Magic Link طويل الصلاحية","Password Reset Token لا يُلغى بعد الاستخدام"]},
+{code:"OAUTH",name:"OAuth وAccess Tokens",root:"حدود الثقة بين المستخدم والتطبيق وخادم التفويض غير مطبقة بصورة صارمة.",fix:"مطابقة Redirect URI حرفيًا، ربط Authorization Code بالعميل والجلسة، استخدام state/PKCE عند الحاجة والتحقق من audience وissuer وscope.",labs:["View As — Token Context Confusion","Redirect URI Validation","OAuth State Missing","Authorization Code Replay","Token Audience Confusion","Excessive OAuth Scope","Client Mix-up Simulation","Refresh Token Reuse","Token Leakage عبر Referer وهمي","App-to-App Token Confusion"]},
+{code:"ACCESS",name:"التحكم في الوصول وIDOR/BOLA",root:"الخادم يعتمد على معرف أو قيمة يرسلها العميل دون تحقق مستقل من ملكية المورد أو صلاحية المستخدم.",fix:"تطبيق Authorization server-side لكل كائن ولكل عملية مع deny-by-default وعدم اعتبار إخفاء المعرفات وسيلة حماية.",labs:["قراءة Profile خاص عبر IDOR","تعديل منشور مستخدم آخر","حذف تعليق عبر Object ID","عرض ألبوم خاص","تحميل Attachment غير مملوك","تغيير إعدادات صفحة دون Role Check","الوصول إلى Draft غير منشور","تبديل Owner ID في Request","قراءة سجل نشاط مستخدم آخر","Mass Assignment لصلاحية Admin"]},
+{code:"API",name:"REST وGraphQL وواجهات API",root:"واجهة API تعيد بيانات أو تنفذ عمليات أكثر مما ينبغي أو تطبق سياسات غير متسقة بين المسارات.",fix:"Object/Field-level Authorization، حدود للاستعلامات والصفحات، Validation موحد ورفض الحقول غير المطلوبة.",labs:["GraphQL Field Overexposure","Nested Query Resource Exhaustion","REST Endpoint Authorization Gap","Hidden Field Exposure","Batch API Permission Confusion","Pagination Limit Bypass","Filter Logic Injection","Deprecated API Version Exposure","Inconsistent Error Disclosure","Mutation Authorization Missing"]},
+{code:"SESSION",name:"الجلسات وCookies وCSRF",root:"دورة حياة الجلسة أو ربط الطلب بهوية المستخدم غير محكمة بما يكفي.",fix:"تدوير Session ID، إبطال الجلسات القديمة، HttpOnly/Secure/SameSite، CSRF Protection وإعادة التحقق للعمليات الحساسة.",labs:["CSRF على تغيير البريد","Session Fixation","Logout لا يبطل الجلسة","Concurrent Session Revocation Gap","Cookie بدون HttpOnly","Cookie Scope واسع","Session ID لا يتغير بعد Login","Remember-Me Token ضعيف","CSRF على ربط تطبيق خارجي","Sensitive Action دون Re-authentication"]},
+{code:"WEBHOOK",name:"Webhooks والتكاملات",root:"تكامل خارجي أو Callback يعامل كمصدر موثوق دون تحقق كاف من التوقيع أو الزمن أو السياق.",fix:"HMAC Signatures، Replay Protection، Timestamp Validation، Idempotency ومبدأ Least Privilege.",labs:["Webhook Signature Missing","Webhook Replay","Old Timestamp Accepted","Callback URL Confusion","App Secret Exposure Simulation","Integration Scope Excess","Webhook Event Authorization Gap","Duplicate Event Processing","Tenant Mix-up في Integration","Untrusted Metadata Processing"]},
+{code:"PRIVACY",name:"الخصوصية وScraping وتسرب البيانات",root:"المنتج يسمح بكشف أو تجميع بيانات أكثر من الحد الأدنى اللازم.",fix:"Data Minimization، Quotas، Rate Limits، Field Authorization، Anti-automation Controls وسياسات Retention واضحة.",labs:["Excessive Profile Fields","Phone Lookup Enumeration","Email Enumeration","Search Scraping at Scale","Friend List Exposure","Location Metadata Exposure","Deleted Content Retention Gap","Private Reaction Count Leak","Cross-Profile Correlation Leak","Export Contains Hidden Fields"]},
+{code:"REALTIME",name:"المراسلة والاتصال وState Machines",root:"آلة الحالات تسمح بانتقال حساس قبل تحقق الشروط الأمنية المطلوبة.",fix:"Server-side Finite State Machine، التحقق من كل Transition، Sequencing/Nonces ورفض الرسائل خارج الحالة المتوقعة.",labs:["Call Media قبل Accept","Message Edit بعد انتهاء المهلة","Reaction على Message غير مرئي","Join Group Call دون Invite","Typing Event Privacy Leak","Read Receipt State Confusion","Attachment قبل Permission Check","Message Recall Race Condition","Voice Room Role Transition","Realtime Subscription Authorization Gap"]},
+{code:"BUSINESS",name:"منطق الأعمال والصفحات والإعلانات",root:"تسلسل الأعمال يخرق invariant أمني أو مالي بسبب تحقق ناقص في إحدى المراحل.",fix:"تعريف invariants صريحة، تحقق server-side عند كل transition، idempotency وصلاحيات أدوار دقيقة.",labs:["Page Role Escalation","Ad Credit Double Spend Simulation","Invite Acceptance Race","Business Asset Transfer Gap","Commerce Coupon Reuse","Admin Removal Lockout Logic","Scheduled Post Ownership Gap","Duplicate Payment Callback","Page Merge Permission Confusion","Business Manager Tenant Isolation"]},
+{code:"MOBILE",name:"أمن تطبيقات الهاتف والعميل",root:"العميل يعامل كبيئة موثوقة أو يحتفظ بمعلومات حساسة بطريقة غير مناسبة.",fix:"اعتبار العميل غير موثوق، تخزين الأسرار في Keystore/Keychain، منع السجلات الحساسة وفرض الصلاحيات على الخادم.",labs:["Access Token في Log","Deep Link Parameter Trust","Insecure Local Token Storage","Exported Android Component","WebView Origin Confusion","Backup يحتوي Session Data","Debug Endpoint مفعّل","Certificate Validation Misconfiguration Lab","Sensitive Screenshot Exposure","Client-side Role Check Only"]}
+];
+
+const historical={
+"View As — Token Context Confusion":{year:"2018",text:"مستوحى من حادثة View As التي أعلنت Facebook أنها تسببت في كشف Access Tokens لحسابات متأثرة."},
+"تجاوز 2FA عبر مسار بديل":{year:"2022",text:"مستوحى من سلسلة Account Recovery و2FA التي ناقشتها Meta ضمن مراجعة برنامج Bug Bounty."},
+"غياب Rate Limit لرمز OTP":{year:"2022",text:"مستوحى من تقرير منشور عن ضعف Rate Limiting لمحاولات SMS 2FA."},
+"Call Media قبل Accept":{year:"2020",text:"يعيد تمثيل فئة State Machine في الاتصال قبل القبول، باستخدام بيئة وهمية فقط."},
+"Search Scraping at Scale":{year:"2021",text:"مختبر يعيد تمثيل فئات Scraping والحد من جمع البيانات على نطاق واسع ضمن بيئة تدريبية."}
+};
+
+const labs=[];let n=1;
+tracks.forEach((t,ti)=>t.labs.forEach((title,i)=>{
+const level=i<3?"مبتدئ":i<7?"متوسط":"متقدم";
+const h=historical[title]||null;
+labs.push({
+ id:"LAB-"+String(n).padStart(3,"0"),num:n++,track:t.code,trackName:t.name,title,level,historical:!!h,history:h,
+ scenario:"تحتوي SocialLab المحلية على حساب researcher_alpha وحساب victim_demo. يعيد هذا المختبر تمثيل فئة «"+title+"» باستخدام حسابات ورموز وموارد وهمية فقط.",
+ objective:"حدد حد الثقة الذي تم كسره، وقارن السلوك المتوقع بالسلوك الفعلي، ثم اختر السبب الجذري والضابط الدفاعي المناسب.",
+ root:t.root,fix:t.fix,
+ req:"GET /training/"+t.code.toLowerCase()+"/"+(i+1)+"/resource HTTP/1.1\nHost: sociallab.local\nAuthorization: Bearer DEMO_TOKEN_ALPHA\nX-Lab-Mode: vulnerable",
+ res:'HTTP/1.1 200 OK\nContent-Type: application/json\n\n{"lab":"LAB-'+String(n-1).padStart(3,"0")+'","training":true,"note":"inspect trust boundary; no external request was sent"}'
+});
+}));
+
+const completed=new Set(JSON.parse(localStorage.getItem("nexvaryCompleted")||"[]"));
+let selectedTrack="all";
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+function save(){localStorage.setItem("nexvaryCompleted",JSON.stringify([...completed]));updateProgress()}
+function updateProgress(){$("doneCount").textContent=completed.size;$("progressBar").style.width=(completed.size/100*100)+"%"}
+function renderTrackButtons(){
+ const box=$("trackButtons");box.innerHTML="";
+ const all=document.createElement("button");all.className="track-btn active";all.textContent="كل المسارات";all.dataset.track="all";box.appendChild(all);
+ tracks.forEach(t=>{const b=document.createElement("button");b.className="track-btn";b.textContent=t.name;b.dataset.track=t.code;box.appendChild(b)});
+}
+function getFiltered(){
+ const q=$("search").value.trim().toLowerCase(),d=$("difficulty").value,k=$("kind").value;
+ return labs.filter(l=>(selectedTrack==="all"||l.track===selectedTrack)&&(d==="all"||l.level===d)&&(k==="all"||(k==="historical"&&l.historical)||(k==="synthetic"&&!l.historical))&&(!q||(l.id+" "+l.title+" "+l.trackName+" "+l.root).toLowerCase().includes(q)));
+}
+function render(){
+ const list=getFiltered();$("countText").textContent="يعرض "+list.length+" من 100";const box=$("cards");box.innerHTML="";
+ if(!list.length){box.innerHTML='<div class="empty">لا توجد نتائج مطابقة.</div>';return}
+ list.forEach(l=>{const c=document.createElement("article");c.className="card"+(completed.has(l.id)?" done":"");
+ c.innerHTML='<div class="card-top"><span>'+esc(l.id)+'</span><span>'+esc(l.level)+'</span></div><h3>'+esc(l.title)+'</h3><p>'+esc(l.trackName)+'</p><div class="tags">'+(l.historical?'<span class="tag hist">مرجع تاريخي</span>':'<span class="tag">تعليمي اصطناعي</span>')+(completed.has(l.id)?'<span class="tag ok">مكتمل ✓</span>':'')+'</div><button class="open" data-lab="'+l.id+'" type="button">فتح المختبر</button>';
+ box.appendChild(c)});
+}
+function openLab(id,push=true){
+ const l=labs.find(x=>x.id===id);if(!l)return;
+ $("home").classList.add("hide");$("labView").classList.add("show");$("labTitle").textContent=l.title;$("labMeta").textContent=l.id+" • "+l.trackName+" • "+l.level;
+ $("scenario").textContent=l.scenario;$("objective").textContent=l.objective;$("request").textContent=l.req;$("response").textContent=l.res;$("rootCause").textContent=l.root;$("remediation").textContent=l.fix;
+ $("rootBox").classList.remove("show");$("result").textContent="";
+ $("historicalPanel").innerHTML=l.historical?'<h3>مرجع تاريخي</h3><p>'+esc(l.history.text)+' <strong>'+esc(l.history.year)+'</strong></p>':'<h3>نوع السيناريو</h3><p>سيناريو تعليمي اصطناعي. لا يعني وجود هذه الثغرة حاليًا في أي منتج من منتجات Meta.</p>';
+ const correct=l.root;const wrong=["المشكلة الأساسية هي ضعف تشفير الصور في الواجهة.","المشكلة الأساسية هي قصر اسم المستخدم.","المشكلة الأساسية هي لون الزر في التطبيق."];
+ const opts=[correct,...wrong].sort(()=>Math.random()-.5),answers=$("answers");answers.innerHTML="";
+ opts.forEach(o=>{const b=document.createElement("button");b.className="answer";b.type="button";b.textContent=o;b.onclick=()=>{[...answers.children].forEach(x=>x.disabled=true);if(o===correct){b.classList.add("correct");$("result").textContent="صحيح. تم اجتياز المختبر، وظهر الآن السبب الجذري والإصلاح الدفاعي.";completed.add(l.id);save();render();$("rootBox").classList.add("show")}else{b.classList.add("wrong");$("result").textContent="ليست الإجابة الأدق. راجع حدود الهوية والصلاحية والحالة والبيانات في السيناريو.";}};answers.appendChild(b)});
+ if(push&&location.hash!=="#"+id)location.hash=id;
+ window.scrollTo(0,0);
+}
+function closeLab(push=true){$("labView").classList.remove("show");$("home").classList.remove("hide");if(push&&location.hash)history.back();window.scrollTo(0,0)}
+$("cards").addEventListener("click",e=>{const b=e.target.closest("[data-lab]");if(b)openLab(b.dataset.lab)});
+$("trackButtons").addEventListener("click",e=>{const b=e.target.closest("[data-track]");if(!b)return;selectedTrack=b.dataset.track;[...$("trackButtons").children].forEach(x=>x.classList.toggle("active",x===b));render()});
+["search","difficulty","kind"].forEach(id=>$(id).addEventListener(id==="search"?"input":"change",render));
+$("backBtn").addEventListener("click",()=>closeLab(true));
+window.addEventListener("hashchange",()=>{const id=location.hash.replace("#","");if(id&&labs.some(l=>l.id===id))openLab(id,false);else{$("labView").classList.remove("show");$("home").classList.remove("hide")}});
+renderTrackButtons();updateProgress();render();
+const initial=location.hash.replace("#","");if(initial)openLab(initial,false);
+})();
+</script>
+</body>
+</html>
