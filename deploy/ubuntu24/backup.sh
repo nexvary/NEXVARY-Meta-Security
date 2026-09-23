@@ -11,7 +11,7 @@ source .env
 
 docker compose --env-file .env -f compose.yaml exec -T postgres   pg_dump -U hackgpt -d hackgpt | gzip -9 > "$BACKUP_DIR/hackgpt-db-$STAMP.sql.gz"
 
-docker run --rm   -v nexvary-security_connector_state:/source:ro   -v "$BACKUP_DIR:/backup"   alpine sh -c "cd /source && tar -czf /backup/connector-state-$STAMP.tar.gz ."
+docker run --rm   -v nexvary_connector_state:/source:ro   -v "$BACKUP_DIR:/backup"   alpine sh -c "cd /source && tar -czf /backup/connector-state-$STAMP.tar.gz ."
 
 find "$BACKUP_DIR" -type f -mtime +30 -delete
 
