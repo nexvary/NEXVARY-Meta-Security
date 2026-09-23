@@ -14,7 +14,7 @@ SOURCE_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
 echo "[1/8] Installing Ubuntu packages"
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install -y   ca-certificates curl git nginx openssl python3 python3-venv docker.io docker-compose-v2
+DEBIAN_FRONTEND=noninteractive apt-get install -y   ca-certificates curl git nginx openssl python3 python3-venv rsync docker.io docker-compose-v2
 
 systemctl enable --now docker nginx
 
