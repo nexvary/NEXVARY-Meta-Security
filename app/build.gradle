@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
 }
 
+def connectorUrl = providers.gradleProperty("NEXVARY_CONNECTOR_URL")
+        .getOrElse("https://nexvary-security-gateway.local")
+
 android {
     namespace 'com.nexvary.metasecuritylab'
     compileSdk 35
@@ -10,8 +13,28 @@ android {
         applicationId 'com.nexvary.metasecuritylab'
         minSdk 24
         targetSdk 35
-        versionCode 250
-        versionName '2.50.0'
+        versionCode 260
+        versionName '2.60.0'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions += "mode"
+    productFlavors {
+        training {
+            dimension "mode"
+            buildConfigField "boolean", "ENTERPRISE_MODE", "false"
+            buildConfigField "String", "NEXVARY_CONNECTOR_URL", """"
+        }
+        enterprise {
+            dimension "mode"
+            applicationIdSuffix ".enterprise"
+            versionNameSuffix "-enterprise"
+            buildConfigField "boolean", "ENTERPRISE_MODE", "true"
+            buildConfigField "String", "NEXVARY_CONNECTOR_URL", ""${connectorUrl}""
+        }
     }
 
     buildTypes {
