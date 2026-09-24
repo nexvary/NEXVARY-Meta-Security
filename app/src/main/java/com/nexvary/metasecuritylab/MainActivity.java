@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccessFromFileURLs(false);
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setUserAgentString(
-                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.61.0"
+                settings.getUserAgentString() + " NEXVARY-Meta-Security/2.70.0"
         );
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -115,7 +115,14 @@ public class MainActivity extends Activity {
                     WebView view,
                     WebResourceRequest request
             ) {
-                return !isLocal(request.getUrl());
+                Uri uri = request.getUrl();
+                if (isLocal(uri)) {
+                    return false;
+                }
+                if (isAllowedExternalUri(uri)) {
+                    openExternalUri(uri);
+                }
+                return true;
             }
 
             @Override
@@ -382,6 +389,49 @@ public class MainActivity extends Activity {
         }, "nexvary-enterprise-connector").start();
     }
 
+    private boolean isAllowedExternalUri(Uri uri) {
+        if (uri == null || uri.getScheme() == null) {
+            return false;
+        }
+
+        String scheme = uri.getScheme().toLowerCase();
+        if ("mailto".equals(scheme)) {
+            return "info@nexvary.com".equalsIgnoreCase(uri.getSchemeSpecificPart());
+        }
+
+        if (!"https".equals(scheme)) {
+            return false;
+        }
+
+        String host = uri.getHost();
+        if (host == null) {
+            return false;
+        }
+
+        host = host.toLowerCase();
+        return "nexvary.com".equals(host)
+                || "www.nexvary.com".equals(host)
+                || "www.facebook.com".equals(host)
+                || "facebook.com".equals(host)
+                || "www.youtube.com".equals(host)
+                || "youtube.com".equals(host)
+                || "x.com".equals(host)
+                || "www.x.com".equals(host);
+    }
+
+    private void openExternalUri(Uri uri) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(
+                    this,
+                    "تعذر فتح الرابط الخارجي",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
     private String readStream(InputStream stream) throws Exception {
         if (stream == null) {
             return "";
@@ -480,9 +530,9 @@ public class MainActivity extends Activity {
                     getPackageManager()
                             .getPackageInfo(getPackageName(), 0)
                             .versionName;
-            return version == null ? "2.61.0" : version;
+            return version == null ? "2.70.0" : version;
         } catch (Exception e) {
-            return "2.61.0";
+            return "2.70.0";
         }
     }
 
@@ -496,11 +546,7 @@ public class MainActivity extends Activity {
                         + " ? 'handled' : 'home';",
                 value -> {
                     if (!"\"handled\"".equals(value)) {
-                        Toast.makeText(
-                                this,
-                                "أنت في الصفحة الرئيسية",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        finishAfterTransition();
                     }
                 }
         );
