@@ -16,7 +16,18 @@
       <div><h1>NEXVARY Meta Security Lab</h1><p id="stageLabel">Stage 261 • Security Training</p></div>
     </div>
     <div class="top-actions">
-      <button id="langToggle" class="mini-btn" type="button" aria-label="Language">EN</button>
+      <select id="languageSelect" class="language-select" aria-label="Language">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+        <option value="es">Español</option>
+        <option value="de">Deutsch</option>
+        <option value="it">Italiano</option>
+        <option value="fr">Français</option>
+        <option value="ur">اردو</option>
+        <option value="fa">فارسی</option>
+        <option value="ru">Русский</option>
+      </select>
       <div class="safe-chip" data-i18n="safeChip">100 مختبر • Offline</div>
     </div>
   </div>
@@ -25,7 +36,7 @@
     <button type="button" data-view="paths" data-i18n="navPaths">المسارات</button>
     <button type="button" data-view="labs" data-i18n="navLabs">المختبرات</button>
     <button type="button" data-view="exam" data-i18n="navExam">الامتحان</button>
-    <button type="button" data-view="activity" data-i18n="navActivity">السجل</button>\n    <button type="button" data-view="hackgpt">HackGPT</button>
+    <button type="button" data-view="activity" data-i18n="navActivity">السجل</button>\n    <button type="button" data-view="hackgpt" data-i18n="navHackGPT">HackGPT</button>
     <button type="button" data-view="glossary" data-i18n="navGlossary">المصطلحات</button>
     <button type="button" data-view="about" data-i18n="navAbout">حول</button>
   </nav>
@@ -71,6 +82,7 @@
   </main>
 
   <main id="pathsView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="hero compact">
       <h2 data-i18n="pathsTitle">مسارات التعلم</h2>
       <p data-i18n="pathsDesc">ابدأ بمسار مرتب أو تابع من أول مختبر غير مكتمل داخله.</p>
@@ -79,6 +91,7 @@
   </main>
 
   <main id="labsView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <div class="section-head page-head"><h3 data-i18n="labLibrary">مكتبة المختبرات</h3><span id="countText"></span></div>
     <section class="filters">
       <input id="search" type="search" placeholder="بحث: OAuth، IDOR، 2FA، Webhook..." aria-label="Search">
@@ -176,6 +189,7 @@
   </main>
 
   <main id="examView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="hero compact">
       <div class="eyebrow">ASSESSMENT MODE</div>
       <h2 data-i18n="examTitle">امتحان الباحث</h2>
@@ -203,6 +217,7 @@
   </main>
 
   <main id="activityView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="hero compact">
       <h2 data-i18n="activityTitle">سجل التدريب والتقرير</h2>
       <p data-i18n="activityDesc">يعرض آخر أنشطة التدريب على هذا الجهاز فقط ويمكنك تصدير تقرير نصي محلي.</p>
@@ -219,6 +234,7 @@
   </main>
 
   <main id="hackgptView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="hero compact">
       <div class="eyebrow">NEXVARY × HACKGPT ENTERPRISE</div>
       <div class="section-head">
@@ -302,12 +318,14 @@
   </main>
 
   <main id="glossaryView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="hero compact"><h2 data-i18n="glossaryTitle">قاموس الباحث</h2><p data-i18n="glossaryDesc">مصطلحات أساسية لفهم السبب الجذري والضوابط الدفاعية.</p></section>
     <input id="glossarySearch" class="single-search" type="search" placeholder="بحث في المصطلحات...">
     <div id="glossaryGrid" class="glossary-grid"></div>
   </main>
 
   <main id="aboutView" class="view">
+    <div class="page-toolbar"><button class="back" type="button" data-page-back data-i18n="back">رجوع</button></div>
     <section class="about-card"><h3>NEXVARY Meta Security Lab</h3><p data-i18n="aboutDesc">تطبيق Android تدريبي مستقل يعمل Offline لبناء منهج تفكير دفاعي داخل محاكاة محلية.</p></section>
 
     <section class="about-card">
@@ -317,16 +335,26 @@
       <label class="switch-row"><input id="reduceMotion" type="checkbox"><span data-i18n="reduceMotion">تقليل الحركة</span></label>
     </section>
 
-    <section class="about-card"><h3>NEXVARY</h3><div>Website: https://nexvary.com/<br>Facebook: https://www.facebook.com/share/14p9krEn5ij/<br>Email: info@nexvary.com<br>YouTube: www.youtube.com/@NexvaryInc<br>X: https://x.com/Nexvary</div></section>
+    <section class="about-card">
+      <h3>NEXVARY</h3>
+      <div class="social-links">
+        <a class="social-link" href="https://nexvary.com/" data-external="true">Website — nexvary.com</a>
+        <a class="social-link" href="https://www.facebook.com/share/14p9krEn5ij/" data-external="true">Facebook — NEXVARY</a>
+        <a class="social-link" href="mailto:info@nexvary.com" data-external="true">Email — info@nexvary.com</a>
+        <a class="social-link" href="https://www.youtube.com/@NexvaryInc" data-external="true">YouTube — @NexvaryInc</a>
+        <a class="social-link" href="https://x.com/Nexvary" data-external="true">X — @Nexvary</a>
+      </div>
+    </section>
 
     <section class="about-card"><h3 data-i18n="privacySecurity">الخصوصية والأمان</h3><p data-i18n="privacyDesc">لا يطلب التطبيق INTERNET permission. التقدم والملاحظات والنتائج مخزنة محليًا على الجهاز.</p><button id="resetProgress" class="secondary" type="button" data-i18n="resetLocal">تصفير البيانات المحلية</button></section>
   </main>
 
-  <footer class="footer">NEXVARY Meta Security Lab • Stage 250<br><span data-i18n="footerSafety">استخدم المعرفة الأمنية فقط على الأنظمة التي تملكها أو لديك تصريح واضح لاختبارها.</span></footer>
+  <footer class="footer">NEXVARY Meta Security Lab • Stage 270<br><span data-i18n="footerSafety">استخدم المعرفة الأمنية فقط على الأنظمة التي تملكها أو لديك تصريح واضح لاختبارها.</span></footer>
 </div>
 
 <script src="labs.js"></script>
 <script src="curriculum.js"></script>
-<script src="hackgpt-lectures.js"></script>\n<script src="app.js"></script>\n<script src="enterprise.js"></script>
+<script src="hackgpt-lectures.js"></script>
+<script src="i18n-extra.js"></script>\n<script src="app.js"></script>\n<script src="enterprise.js"></script>
 </body>
 </html>
