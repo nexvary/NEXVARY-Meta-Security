@@ -47,7 +47,8 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const today = () => new Date().toISOString().slice(0,10);
   const nowIso = () => new Date().toISOString();
-  const isAr = () => state.language !== 'en';
+  const isAr = () => state.language === 'ar';
+  const isRtlLanguage = () => ['ar','ur','fa'].includes(state.language);
 
   const I18N = {
     ar:{
@@ -98,6 +99,10 @@
     }
   };
 
+  Object.entries(window.NEXVARY_EXTRA_I18N || {}).forEach(([lang, dict]) => {
+    I18N[lang] = Object.assign({}, I18N.en, I18N[lang] || {}, dict);
+  });
+
   const EN_TRACK = {
     AUTH:{root:'The flow fails to preserve the required assurance level during authentication, recovery, or credential changes.',fix:'Require step-up authentication, bind recovery to a trusted session, prevent downgrade, rate-limit attempts, and invalidate used tokens.',signal:'Look for an alternate flow that lowers assurance or allows recovery-token reuse.',hint:'Compare what the primary flow requires with what recovery or change flows require.'},
     OAUTH:{root:'Trust boundaries between the user, client, and authorization server are not enforced strictly enough.',fix:'Use exact redirect matching, bind codes to client/session, validate audience/issuer/scope, and use state/PKCE where applicable.',signal:'Review redirect, client, audience, scope, and the identity context that receives the token.',hint:'Ask whether an authorization result can be moved from one context to another.'},
@@ -132,7 +137,7 @@
     ['Trust Boundary','نقطة انتقال بيانات أو سلطة بين سياقين بمستويات ثقة مختلفة.','A transition of data or authority between contexts with different trust levels.']
   ];
 
-  function t(key) { return (I18N[state.language] || I18N.ar)[key] || key; }
+  function t(key) { const d=I18N[state.language] || I18N.en; return d[key] || I18N.en[key] || I18N.ar[key] || key; }
   function rootText(lab) { return isAr() ? lab.root : EN_TRACK[lab.track].root; }
   function fixText(lab) { return isAr() ? lab.fix : EN_TRACK[lab.track].fix; }
   function signalText(lab) { return isAr() ? lab.signal : EN_TRACK[lab.track].signal; }
@@ -143,8 +148,7 @@
     return curriculum.trackMeta[code].nameEn;
   }
   function difficultyLabel(v) {
-    if (isAr()) return v;
-    return v === 'مبتدئ' ? 'Beginner' : v === 'متوسط' ? 'Intermediate' : 'Advanced';
+    return v === 'مبتدئ' ? t('beginner') : v === 'متوسط' ? t('intermediate') : t('advanced');
   }
   function rankLabel(x) {
     const ar = x >= 12000 ? 'خبير' : x >= 8000 ? 'متقدم' : x >= 4500 ? 'محلل' : x >= 2000 ? 'باحث' : x >= 700 ? 'متدرب+' : 'متدرب';
@@ -191,14 +195,15 @@
   }
 
   function applyLanguage() {
-    const ar=isAr();
-    document.documentElement.lang=ar?'ar':'en';
-    document.documentElement.dir=ar?'rtl':'ltr';
-    $('langToggle').textContent=ar?'EN':'AR';
+    const lang = I18N[state.language] ? state.language : 'en';
+    const rtl = isRtlLanguage();
+    document.documentElement.lang = lang;
+    document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+    if ($('languageSelect')) $('languageSelect').value = lang;
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent=t(el.dataset.i18n); });
-    $('search').placeholder=ar?'بحث: OAuth، IDOR، 2FA، Webhook...':'Search: OAuth, IDOR, 2FA, Webhook...';
-    $('glossarySearch').placeholder=ar?'بحث في المصطلحات...':'Search glossary...';
-    $('noteText').placeholder=ar?'اكتب ملاحظاتك عن هذا المختبر...':'Write your notes for this lab...';
+    $('search').placeholder=t('searchPlaceholder');
+    $('glossarySearch').placeholder=t('glossaryPlaceholder');
+    $('noteText').placeholder=t('notePlaceholder');
     renderAll();
   }
 
@@ -658,7 +663,8 @@
   };
 
   document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-  $('langToggle').addEventListener('click',()=>{state.language=isAr()?'en':'ar';persist();applyLanguage();});
+  document.querySelectorAll('[data-page-back]').forEach(b=>b.addEventListener('click',()=>window.NEXVARY_BACK()));
+  $('languageSelect').addEventListener('change',()=>{state.language=$('languageSelect').value;persist();applyLanguage();});
   $('cards').addEventListener('click',e=>{const o=e.target.closest('[data-open]'),f=e.target.closest('[data-fav]');if(o)openLab(o.dataset.open);if(f)toggleFavorite(f.dataset.fav);});
   $('quickTracks').addEventListener('click',e=>{const b=e.target.closest('[data-track]');if(!b)return;filters.track=b.dataset.track;renderQuickTracks();renderLabs();});
   document.querySelectorAll('[data-status]').forEach(b=>b.addEventListener('click',()=>{filters.status=b.dataset.status;document.querySelectorAll('[data-status]').forEach(x=>x.classList.toggle('active',x===b));renderLabs();}));
