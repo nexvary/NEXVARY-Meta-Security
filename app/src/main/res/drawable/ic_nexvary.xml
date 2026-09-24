@@ -4,8 +4,36 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#071019" android:pathData="M6,6 L102,6 L102,102 L6,102 Z"/>
-    <path android:fillColor="#D7B35A" android:pathData="M10,10 L98,10 L98,14 L14,14 L14,94 L98,94 L98,98 L10,98 Z"/>
-    <path android:fillColor="#D7B35A" android:pathData="M28,78 L28,30 L37,30 L71,65 L71,30 L80,30 L80,78 L71,78 L37,43 L37,78 Z"/>
-    <path android:fillColor="#57A9E4" android:pathData="M38,30 L47,30 L80,64 L80,77 L71,77 L38,43 Z"/>
+
+    <!-- dark NEXVARY field -->
+    <path
+        android:fillColor="#071019"
+        android:pathData="M8,8 L100,8 L100,100 L8,100 Z" />
+
+    <!-- metallic/gold shield: kept inside safe icon bounds -->
+    <path
+        android:fillColor="#D7B35A"
+        android:pathData="M54,16 L88,28 L84,61 C81,77 69,88 54,94 C39,88 27,77 24,61 L20,28 Z" />
+
+    <path
+        android:fillColor="#0B1823"
+        android:pathData="M54,22 L81,31 L78,59 C76,71 67,80 54,86 C41,80 32,71 30,59 L27,31 Z" />
+
+    <!-- NEXVARY N -->
+    <path
+        android:fillColor="#D7B35A"
+        android:pathData="M37,72 L37,37 L45,37 L63,59 L63,37 L71,37 L71,72 L63,72 L45,50 L45,72 Z" />
+
+    <!-- electric-blue security circuit -->
+    <path
+        android:fillColor="#57A9E4"
+        android:pathData="M45,37 L51,37 L71,61 L71,72 L65,72 L45,48 Z" />
+    <path
+        android:fillColor="#57A9E4"
+        android:pathData="M31,55 L38,55 L38,59 L31,59 Z M70,48 L79,48 L79,52 L70,52 Z M52,81 L56,81 L56,87 L52,87 Z" />
+
+    <!-- status nodes -->
+    <path android:fillColor="#59C78B" android:pathData="M27,55 m-3,0 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0" />
+    <path android:fillColor="#59C78B" android:pathData="M82,50 m-3,0 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0" />
+    <path android:fillColor="#59C78B" android:pathData="M54,90 m-3,0 a3,3 0,1 0,6 0 a3,3 0,1 0,-6 0" />
 </vector>
