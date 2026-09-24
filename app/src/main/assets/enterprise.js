@@ -6,7 +6,7 @@
   let connectorUrl = '';
 
   function isAr() {
-    return document.documentElement.lang !== 'en';
+    return document.documentElement.lang === 'ar';
   }
 
   function safeNative() {
@@ -269,7 +269,7 @@
     $('hgReport')?.addEventListener('click', callReport);
     $('hgRegisterAuthorization')?.addEventListener('click', registerAuthorization);
 
-    $('langToggle')?.addEventListener('click', () => {
+    $('languageSelect')?.addEventListener('change', () => {
       setTimeout(() => {
         renderLanguage();
         readNativeMode();
