@@ -66,8 +66,8 @@ jobs:
           test -f app/src/main/assets/enterprise.js
           test -f app/src/enterprise/AndroidManifest.xml
 
-          grep -q 'versionCode 261' app/build.gradle
-          grep -q "versionName '2.61.0'" app/build.gradle
+          grep -q 'versionCode 270' app/build.gradle
+          grep -q "versionName '2.70.0'" app/build.gradle
           grep -q 'productFlavors' app/build.gradle
           grep -q 'ENTERPRISE_MODE' app/build.gradle
           grep -q 'NEXVARY_CONNECTOR_URL' app/build.gradle
@@ -115,10 +115,48 @@ jobs:
           grep -q 'setOnApplyWindowInsetsListener' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
           ! grep -q 'LinearLayout bar =' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
           grep -q 'viewport-fit=cover' app/src/main/assets/index.html
-          grep -q 'Stage 261' app/src/main/assets/index.html
-          grep -q 'Android phone UI Release Gate v2.61' app/src/main/assets/styles.css
+          grep -q 'Stage 270' app/src/main/assets/index.html
+          grep -q 'Navigation / multilingual / About integrity release gate v2.70' app/src/main/assets/styles.css
           grep -q 'grid-template-columns:repeat(4,minmax(0,1fr))' app/src/main/assets/styles.css
           grep -q 'safe-area-inset-bottom' app/src/main/assets/styles.css
+
+      - name: Security dependency audit
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check pip-audit
+          pip-audit -r enterprise-connector/requirements.txt
+
+      - name: Install Playwright Chromium
+        shell: bash
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Navigation Integrity Gate
+        shell: bash
+        run: |
+          node tests/navigation-integrity.mjs
+
+      - name: UI Release Gate
+        shell: bash
+        run: |
+          node tests/ui-release-gate.mjs
+
+      - name: Back / language / About / icon static gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'finishAfterTransition' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'isAllowedExternalUri' app/src/main/java/com/nexvary/metasecuritylab/MainActivity.java
+          grep -q 'data-page-back' app/src/main/assets/index.html
+          test "$(grep -o '<option value="[a-z][a-z]"' app/src/main/assets/index.html | wc -l)" -eq 10
+          grep -q 'mailto:info@nexvary.com' app/src/main/assets/index.html
+          grep -q 'https://nexvary.com/' app/src/main/assets/index.html
+          grep -q 'https://www.facebook.com/share/14p9krEn5ij/' app/src/main/assets/index.html
+          grep -q 'https://www.youtube.com/@NexvaryInc' app/src/main/assets/index.html
+          grep -q 'https://x.com/Nexvary' app/src/main/assets/index.html
+          grep -q '#D7B35A' app/src/main/res/drawable/ic_nexvary.xml
+          grep -q '#57A9E4' app/src/main/res/drawable/ic_nexvary.xml
 
       - name: Android lint
         run: gradle :app:lintTrainingDebug :app:lintEnterpriseDebug --stacktrace
@@ -160,7 +198,7 @@ jobs:
       - name: Upload Training APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEXVARY-Meta-Security-Training-2.61.0
+          name: NEXVARY-Meta-Security-Training-2.70.0
           path: |
             app/build/outputs/apk/training/debug/app-training-debug.apk
             training-sha256.txt
@@ -171,7 +209,7 @@ jobs:
       - name: Upload Enterprise APK
         uses: actions/upload-artifact@v4
         with:
-          name: NEXVARY-Meta-Security-Enterprise-2.61.0
+          name: NEXVARY-Meta-Security-Enterprise-2.70.0
           path: |
             app/build/outputs/apk/enterprise/debug/app-enterprise-debug.apk
             enterprise-sha256.txt
